@@ -1,2 +1,1 @@
-tkinter
-ttkbootstrap
+ttkbootstrap==1.19.2
