@@ -15,9 +15,6 @@ class SimpleApp:
         self.width = width     
         self.height = height   
         
-        self.ip = "127.0.0.1"
-        self.port = "00000"
-        
         style = ttk.Style()
         # Configure a red (danger) button style with larger font/padding
         style.configure("danger.TButton", font=("Arial", 46), padding=16,)
