@@ -58,12 +58,12 @@ class GradientAudioMeter(ttk.Canvas):
             fill=mask_color, outline=mask_color, tags="mask"
         )
 
-def change_fader1_value(self, value):       
-    self.fader_levels["fader1"] = value
+# def change_fader1_value(self, value):       
+#     self.fader_levels["fader1"] = value
     
-def update_fader1_level(self):
-    level = self.fader1slider.get()
-    noise = random.randint(-5,5)
-    level += noise
-    self.level1.set_level(level)
-    self.master.after(self.update_interval, self.update_fader1_level)
+# def update_fader1_level(self):
+#     level = self.fader1slider.get()
+#     noise = random.randint(-5,5)
+#     level += noise
+#     self.level1.set_level(level)
+#     self.master.after(self.update_interval, self.update_fader1_level)

@@ -3,8 +3,8 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 import random
 from PIL import Image, ImageTk
-from audiometer import GradientAudioMeter, change_fader1_value, update_fader1_level
 from uihelper import drawfaderbank, ip_settings
+from ahm_control import initialize_connection, close_connection
 
 ## Most code was generated with ChatGPT 5.2 and rewritten to fit needs
 
@@ -67,7 +67,7 @@ class SimpleApp:
         
         label = ttk.Label(sure_window, text="Power Off?", font=("Arial", 24), background="#363C4D", foreground="white")
         label.pack(pady=20)
-        yes_button = ttk.Button(sure_window, width=16, text="Shut Down", bootstyle="danger", style="Dialog.TButton", command=self.master.destroy)
+        yes_button = ttk.Button(sure_window, width=16, text="Shut Down", bootstyle="danger", style="Dialog.TButton", command=self.shutdown)
         yes_button.pack(side="left", padx=30, pady=16)
         no_button = ttk.Button(sure_window, width=16, text="Cancel", bootstyle="secondary", style="Dialog.TButton", command=sure_window.destroy)
         no_button.pack(side="right", padx=30, pady=16)
@@ -93,15 +93,20 @@ class SimpleApp:
         
         ip_settings(self, settings_window)
 
+    def shutdown(self):
+        close_connection()  # Ensure AHM connection is closed on shutdown
+        self.master.destroy()
 
         
 if __name__ == "__main__":
+    # kiosk features:
     app = ttk.Window(themename="darkly", scaling=1.5) 
     # width = app.winfo_screenwidth()
     # height = app.winfo_screenheight()
     width = 1280
     height = 720
     print(f"Screen size: {width}x{height}")
+    initialize_connection()  # Establish AHM connection at startup
     SimpleApp(width, height, app)
     app.attributes("-fullscreen", True)
     app.resizable(False, False)

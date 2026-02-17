@@ -2,15 +2,17 @@ import tkinter as tk  # Add at top of file
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 import random
-from bak.test import GradientAudioMeter
+# from bak.test import GradientAudioMeter
+from audiometer import GradientAudioMeter
+from ahm_control import setlevel
 
 class FaderManager:
     fadersConstrains = {
         "fader1": [20, 20],
-        "fader2": [220, 20],
-        "fader3": [420, 20],
-        "fader4": [620, 20],
-        "fader5": [820, 20]
+        # "fader2": [220, 20],
+        # "fader3": [420, 20],
+        # "fader4": [620, 20],
+        # "fader5": [820, 20]
     }
     faders = []
     master = None
@@ -32,6 +34,7 @@ class Fader:
     fader_level = 0
     update_interval = 100  # milliseconds
     master = None
+    api_thread = None
     def __init__(self, master, x, y, label):
         self.master = master
 
@@ -56,8 +59,10 @@ class Fader:
         self.level1 = GradientAudioMeter(self.fader1group, width=50, height=800)
         self.level1.pack(side="right", pady=15)
 
-    def changeFaderValue(self, value):       
-        self.fader_level = int(value)
+    def changeFaderValue(self, value):
+        value = int(value)
+        setlevel(value)
+        self.fader_level = value
 
     def updateFaderLevel(self):
         level = self.fader1slider.get()
