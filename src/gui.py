@@ -3,7 +3,6 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 import random
 from PIL import Image, ImageTk
-from audiometer import GradientAudioMeter, change_fader1_value, update_fader1_level
 from uihelper import drawfaderbank, ip_settings
 
 ## Most code was generated with ChatGPT 5.2 and rewritten to fit needs

@@ -2,7 +2,8 @@ import tkinter as tk  # Add at top of file
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 import random
-from bak.test import GradientAudioMeter
+# from bak.test import GradientAudioMeter
+from audiometer import GradientAudioMeter
 
 class FaderManager:
     fadersConstrains = {
