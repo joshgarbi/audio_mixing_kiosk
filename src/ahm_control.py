@@ -7,6 +7,7 @@ with open('src/cfg.json', 'r') as jsonfile:
 ip_address = data['ip_address']
 port = data['port']
 
+# Example usage
 def send_command(command):
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

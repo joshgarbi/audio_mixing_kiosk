@@ -95,6 +95,7 @@ class SimpleApp:
 
         
 if __name__ == "__main__":
+    # kiosk features:
     app = ttk.Window(themename="darkly", scaling=1.5) 
     # width = app.winfo_screenwidth()
     # height = app.winfo_screenheight()
