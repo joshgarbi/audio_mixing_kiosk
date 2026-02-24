@@ -20,7 +20,7 @@ class SimpleApp:
         style.configure("danger.TButton", font=("Arial", 46), padding=16,)
         style.configure("Dialog.TButton", font=("Arial", 18), padding=12)
         style.configure("secondary.TButton", font=("Arial", 36), padding=12)
-        style.configure("tertiary.TFrame", background="#FF00B3")
+        style.configure("tertiary.TFrame", background="#1e1e1e")
         
         drawfaderbank(self, master)
         
@@ -97,6 +97,7 @@ class SimpleApp:
         close_connection()  # Ensure AHM connection is closed on shutdown
         self.master.destroy()
 
+    print()
         
 if __name__ == "__main__":
     # kiosk features:

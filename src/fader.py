@@ -2,18 +2,17 @@ import tkinter as tk  # Add at top of file
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 import random
+import json
 # from bak.test import GradientAudioMeter
 from audiometer import GradientAudioMeter
-from ahm_control import setlevel
+from ahm_control import setCHlevel, getCHlevel
+
+with open('src/cfg.json', 'r') as jsonfile:
+    data = json.load(jsonfile)
+
 
 class FaderManager:
-    fadersConstrains = {
-        "fader1": [20, 20],
-        # "fader2": [220, 20],
-        # "fader3": [420, 20],
-        # "fader4": [620, 20],
-        # "fader5": [820, 20]
-    }
+    fadersConstrains = data["BANK"]
     faders = []
     master = None
 
@@ -22,7 +21,7 @@ class FaderManager:
     
     def createFaders(self):
         for faderName, faderPosition in self.fadersConstrains.items():
-            self.fader = Fader(self.master, faderPosition[0], faderPosition[1], faderName)
+            self.fader = Fader(self.master, faderPosition["position"][0], faderPosition["position"][1], faderName)
             self.faders.append(self.fader)
             
     def updateAll(self):
@@ -37,7 +36,7 @@ class Fader:
     api_thread = None
     def __init__(self, master, x, y, label):
         self.master = master
-
+        self.channel = int(label[-1]) - 1
         self.fader1group = ttk.Frame(master, style="tertiary.TFrame")
         self.fader1group.place(x=x, y=y, width=175, height=675)
     
@@ -53,7 +52,7 @@ class Fader:
             sliderlength=160, sliderrelief='solid', width=75, bd=0)
         
         
-        self.fader1slider.set(0)
+        self.fader1slider.set(getCHlevel(self.channel))
         self.fader1slider.pack(pady=5)
         
         self.level1 = GradientAudioMeter(self.fader1group, width=50, height=800)
@@ -61,7 +60,7 @@ class Fader:
 
     def changeFaderValue(self, value):
         value = int(value)
-        setlevel(value)
+        setCHlevel(value, self.channel)
         self.fader_level = value
 
     def updateFaderLevel(self):
