@@ -24,7 +24,7 @@ class SimpleApp:
         
         drawfaderbank(self, master)
         
-        pil_image = Image.open("power.png")
+        pil_image = Image.open("resources/power.png")
         pil_image = pil_image.resize((75, 75))
         self.tk_image = ImageTk.PhotoImage(pil_image)
 

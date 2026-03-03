@@ -46,11 +46,12 @@ def close_connection():
             return
 
 def test_connection():
+    temp = -1
     if _socket:
         temp = getCHlevel(0)
-        return temp
-    return -1
-
+ 
+    return temp != -1
+    
 def mute():
     if _socket:
         try:
