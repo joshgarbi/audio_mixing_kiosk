@@ -94,7 +94,7 @@ class SimpleApp:
         ip_settings(self, settings_window)
 
     def shutdown(self):
-        close_connection()  # Ensure AHM connection is closed on shutdown
+        close_connection()
         self.master.destroy()
 
     print()
