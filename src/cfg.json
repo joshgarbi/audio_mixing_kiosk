@@ -1,7 +1,7 @@
 {
     "TCP": {
-        "ip_address": "192.160.0.91",
-        "port": 65535
+        "ip_address": "192.168.1.91",
+        "port": 51325
     },
     "BANK": {
         "fader1": {

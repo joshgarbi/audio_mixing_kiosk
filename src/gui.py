@@ -1,10 +1,9 @@
 import tkinter as tk  # Add at top of file
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
-import random
 from PIL import Image, ImageTk
 from uihelper import drawfaderbank, ip_settings
-from ahm_control import initialize_connection, close_connection
+from ahm_control import initialize_connection, close_connection, restart_connection
 
 ## Most code was generated with ChatGPT 5.2 and rewritten to fit needs
 

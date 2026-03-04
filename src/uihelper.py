@@ -3,7 +3,7 @@ import tkinter as tk
 from ttkbootstrap.constants import *
 import json
 from fader import FaderManager
-from ahm_control import test_connection
+from ahm_control import test_connection, restart_connection
 
 
 
@@ -31,8 +31,8 @@ def ip_settings(self, masterC):
     ip_frame = ttk.Frame(masterC)
     ip_frame.place(x=10, y=10, width=400, height=200)
 
-    vip_cmd = (ip_frame.register(validate_ip), '%P')
-    vport_cmd = (ip_frame.register(validate_port), '%P')
+    vip_cmd = (ip_frame.register(lambda p: validate_ip(self, p)), '%P')
+    vport_cmd = (ip_frame.register(lambda p: validate_port(self, p)), '%P')
 
     ipSettings = ttk.Entry(
         ip_frame,
@@ -58,7 +58,7 @@ def ip_settings(self, masterC):
     
     portSettings.configure(font=36)
     portSettings.place(x=210, y = 5, width=100, height=50)
-
+    
     self.connectionStatus = ttk.Label(
         ip_frame,
         text="STATUS",
@@ -66,23 +66,35 @@ def ip_settings(self, masterC):
     self.connectionStatus.configure(font=36)
     self.connectionStatus.place(x=315, y=5, width=80, height=50)
 
-    if test_connection() != -1:
+    if test_connection() != None:
         self.connectionStatus.configure(style="Green.TLabel")
+    else:
+        self.connectionStatus.configure(style="Red.TLabel")
+        
+def handle_reconnection(self):
+    self.connectionStatus.configure(style="Red.TLabel")
+    restart_connection()
+    
+    if test_connection() is not None:
+        self.connectionStatus.configure(style="Green.TLabel")
+
     else:
         self.connectionStatus.configure(style="Red.TLabel")
 
 
-def validate_port(port_str):
+
+def validate_port(self, port_str):
     try:
         port = int(port_str)
         if 0 <= port <= 65535:
             savedata('port', port)
+            handle_reconnection(self)
             return True
     except:
         pass    
     return False
 
-def validate_ip(ip_str):
+def validate_ip(self, ip_str):
     try:
         parts = ip_str.split('.')
         if len(parts) != 4:
@@ -92,6 +104,7 @@ def validate_ip(ip_str):
             if not (0 <= num <= 255):
                 raise ValueError("Each part of IP must be between 0 and 255.")
         savedata('ip_address', ip_str)
+        handle_reconnection(self)
         return True
     except:
         return False

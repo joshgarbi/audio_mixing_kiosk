@@ -29,10 +29,11 @@ def testL_ahm_connection():
         print(f"Connection failed: {e}")
         assert False, "Could not connect to AHM server"
         
-@pytest.mark.skipif(
-    _connect_status == False, 
-    reason="Console not connected, skipping test"
-)
+# @pytest.mark.skipif(
+#     _connect_status == False, 
+#     reason="Console not connected, skipping test"
+# )
 def test_ahm_connection(get_test_connection):
     assert get_test_connection
+
     

@@ -2,13 +2,13 @@
 import json
 import socket
 import time
-import atexit
+from pythonping import ping
 
 
 
 
 # AHM_IP = "192.168.1.91"
-# PORT = 51325
+# AHM_PORT = 51325
 
 channel = 0x00
 MUTE_NOTE = bytes([0x90, 0x00, 0x7F, 0x90, 0x00, 0x00])
@@ -21,7 +21,7 @@ with open('src/cfg.json', 'r') as jsonfile:
     data = json.load(jsonfile)
 
 AHM_IP = data["TCP"]["ip_address"]
-PORT = data["TCP"]["port"]
+AHM_PORT = data["TCP"]["port"]
 # Persistent socket connection
 _socket = None
 
@@ -30,11 +30,13 @@ def initialize_connection():
     global _socket
     try:
         _socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        _socket.settimeout(2)
-        _socket.connect((AHM_IP, PORT))
+        _socket.settimeout(1)
+        _socket.connect((AHM_IP, AHM_PORT))
         time.sleep(0.1)
         print("AHM connection established!")
+        print(AHM_IP, AHM_PORT)
     except Exception as e:
+        print(AHM_IP, AHM_PORT)
         print(f"Failed to connect to AHM: {e}")
         _socket = None
         
@@ -42,15 +44,38 @@ def close_connection():
     if _socket:
         try:
             _socket.close()
+            print("AHM connection closed.")
         except:
             return
 
 def test_connection():
-    temp = -1
+    GET_CHNAME = SYSEX_HEADER + bytes([0x00, 0x09, 0x00, 0xF7])
     if _socket:
-        temp = getCHlevel(0)
- 
-    return temp != -1
+        try:
+            _socket.sendall(GET_CHNAME)
+            data = _socket.recv(4)
+            return data
+        except:
+            pass
+    return None
+    
+
+def restart_connection():
+    global _socket
+    update_settings()
+    if _socket:
+        close_connection()
+        _socket = None
+    initialize_connection()
+    
+def update_settings():
+    global AHM_IP
+    global AHM_PORT
+    with open('src/cfg.json', 'r') as f:
+        data = json.load(f)
+
+    AHM_IP = data['TCP']['ip_address']
+    AHM_PORT = data['TCP']['port']
     
 def mute():
     if _socket:
