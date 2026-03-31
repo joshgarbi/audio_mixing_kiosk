@@ -23,6 +23,6 @@
     Determining the meter colors is a bit complicated. This file handles the color value for the meter based on height from base and changes color. It uses an alpha layer to modulate the meter
 
 ### [ahm_control.py](../src/ahm_control.py) 
-#### *NEEDS EDIT*
 
-    Currently in development. Will act as the interface between the gui helper and the Allen & Heath AHM TCP API
+    Acts as the interface between the gui helper and the Allen & Heath AHM TCP API. Calls to change channel level pass a int value for level that is combined with the correct hex and sent over the open TCP socket. 
+    

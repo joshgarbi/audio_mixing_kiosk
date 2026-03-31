@@ -1,4 +1,43 @@
 {
-    "ip_address": "192.168.1.91",
-    "port": 51325
+    "TCP": {
+        "ip_address": "192.168.1.91",
+        "port": 51325
+    },
+    "BANK": {
+        "fader1": {
+            "position": [
+                20,
+                20
+            ],
+            "ch": 0
+        },
+        "fader2": {
+            "position": [
+                220,
+                20
+            ],
+            "ch": 1
+        },
+        "fader3": {
+            "position": [
+                420,
+                20
+            ],
+            "ch": 2
+        },
+        "fader4": {
+            "position": [
+                620,
+                20
+            ],
+            "ch": 3
+        },
+        "fader5": {
+            "position": [
+                820,
+                20
+            ],
+            "ch": 4
+        }
+    }
 }

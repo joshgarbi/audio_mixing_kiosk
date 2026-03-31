@@ -1,15 +1,18 @@
 import ttkbootstrap as ttk
 import tkinter as tk
-from audiometer import GradientAudioMeter
 from ttkbootstrap.constants import *
-from fader import FaderManager
 import json
+from fader import FaderManager
+from ahm_control import test_connection, restart_connection
 
-def drawfaderbank(self, master):
-    self.canvas = ttk.Canvas(master, width=self.width, height=self.height, highlightthickness=0)
+
+
+
+def drawfaderbank(self, masterC):
+    self.canvas = ttk.Canvas(masterC, width=self.width, height=self.height, highlightthickness=0)
     self.canvas.pack(fill="both", expand=True)
         
-    self.faderBank = ttk.Frame(master, style="secondary.TFrame")
+    self.faderBank = ttk.Frame(masterC, style="secondary.TFrame")
     self.faderBank.place(x=170, y=0, width=self.width - 170, height=self.height)
     
     # self.fader1 = Fader(self.faderBank, x=20, y=20, label="Fader 1")
@@ -19,12 +22,23 @@ def drawfaderbank(self, master):
 
 
 def ip_settings(self, masterC):
+    self.masterC = masterC
+    style = ttk.Style()
+
+    style.configure("Red.TLabel", foreground="red")
+    style.configure("Green.TLabel", foreground="green")
+
     ip_frame = ttk.Frame(masterC)
     ip_frame.place(x=10, y=10, width=400, height=200)
+
+    vip_cmd = (ip_frame.register(lambda p: validate_ip(self, p)), '%P')
+    vport_cmd = (ip_frame.register(lambda p: validate_port(self, p)), '%P')
+
     ipSettings = ttk.Entry(
         ip_frame,
         validate='focusout',
-        validatecommand=lambda: validate_ip(ipSettings.get())          
+        validatecommand=vip_cmd,
+        
     )
 
     ipSettings.delete(0, tk.END)
@@ -36,7 +50,7 @@ def ip_settings(self, masterC):
     portSettings = ttk.Entry(
         ip_frame,
         validate='focusout',
-        validatecommand=lambda: validate_port(portSettings.get())
+        validatecommand=vport_cmd,
     )
 
     portSettings.delete(0, tk.END)
@@ -44,18 +58,43 @@ def ip_settings(self, masterC):
     
     portSettings.configure(font=36)
     portSettings.place(x=210, y = 5, width=100, height=50)
+    
+    self.connectionStatus = ttk.Label(
+        ip_frame,
+        text="STATUS",
+    )
+    self.connectionStatus.configure(font=36)
+    self.connectionStatus.place(x=315, y=5, width=80, height=50)
 
-def validate_port(port_str):
+    if test_connection() != None:
+        self.connectionStatus.configure(style="Green.TLabel")
+    else:
+        self.connectionStatus.configure(style="Red.TLabel")
+        
+def handle_reconnection(self):
+    self.connectionStatus.configure(style="Red.TLabel")
+    restart_connection()
+    
+    if test_connection() is not None:
+        self.connectionStatus.configure(style="Green.TLabel")
+
+    else:
+        self.connectionStatus.configure(style="Red.TLabel")
+
+
+
+def validate_port(self, port_str):
     try:
         port = int(port_str)
         if 0 <= port <= 65535:
             savedata('port', port)
-        else:
-            raise ValueError("Port number must be between 0 and 65535.")
+            handle_reconnection(self)
+            return True
     except:
-        raise TypeError("Port Must be a number between 0 and 65535")
+        pass    
+    return False
 
-def validate_ip(ip_str):
+def validate_ip(self, ip_str):
     try:
         parts = ip_str.split('.')
         if len(parts) != 4:
@@ -65,15 +104,19 @@ def validate_ip(ip_str):
             if not (0 <= num <= 255):
                 raise ValueError("Each part of IP must be between 0 and 255.")
         savedata('ip_address', ip_str)
+        handle_reconnection(self)
+        return True
     except:
-        raise TypeError("Invalid IP address format. Must be in the form x.x.x.x where x is 0-255.")
+        return False
+
+
 
 def savedata(label, value):
     #read, modify, write to json config
     with open('src/cfg.json', 'r') as jsonfile:
         data = json.load(jsonfile)
    
-    data[label] = value
+    data["TCP"][label] = value
 
     with open('src/cfg.json', 'w') as jsonfile:
         json.dump(data, jsonfile, indent=4)      
@@ -82,4 +125,4 @@ def getdata(label):
     with open('src/cfg.json', 'r') as jsonfile:
         data = json.load(jsonfile)
 
-    return data[label]
+    return data["TCP"][label]

@@ -1,10 +1,9 @@
 import tkinter as tk  # Add at top of file
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
-import random
 from PIL import Image, ImageTk
 from uihelper import drawfaderbank, ip_settings
-from ahm_control import initialize_connection, close_connection
+from ahm_control import initialize_connection, close_connection, restart_connection
 
 ## Most code was generated with ChatGPT 5.2 and rewritten to fit needs
 
@@ -20,11 +19,11 @@ class SimpleApp:
         style.configure("danger.TButton", font=("Arial", 46), padding=16,)
         style.configure("Dialog.TButton", font=("Arial", 18), padding=12)
         style.configure("secondary.TButton", font=("Arial", 36), padding=12)
-        style.configure("tertiary.TFrame", background="#FF00B3")
+        style.configure("tertiary.TFrame", background="#1e1e1e")
         
         drawfaderbank(self, master)
         
-        pil_image = Image.open("power.png")
+        pil_image = Image.open("resources/power.png")
         pil_image = pil_image.resize((75, 75))
         self.tk_image = ImageTk.PhotoImage(pil_image)
 
@@ -94,9 +93,10 @@ class SimpleApp:
         ip_settings(self, settings_window)
 
     def shutdown(self):
-        close_connection()  # Ensure AHM connection is closed on shutdown
+        close_connection()
         self.master.destroy()
 
+    print()
         
 if __name__ == "__main__":
     # kiosk features:
