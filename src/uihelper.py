@@ -83,18 +83,19 @@ def handle_reconnection(self):
 
 
 
-def validate_port(self, port_str):
+def validate_port(self, port_str, debug=False):
     try:
         port = int(port_str)
         if 0 <= port <= 65535:
             savedata('port', port)
-            handle_reconnection(self)
+            if not debug:
+                handle_reconnection(self)
             return True
     except:
         pass    
     return False
 
-def validate_ip(self, ip_str):
+def validate_ip(self, ip_str, debug=False):
     try:
         parts = ip_str.split('.')
         if len(parts) != 4:
@@ -104,7 +105,8 @@ def validate_ip(self, ip_str):
             if not (0 <= num <= 255):
                 raise ValueError("Each part of IP must be between 0 and 255.")
         savedata('ip_address', ip_str)
-        handle_reconnection(self)
+        if not debug:
+            handle_reconnection(self)
         return True
     except:
         return False

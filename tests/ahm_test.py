@@ -14,8 +14,9 @@ def get_test_connection():
     os.environ.get('CI') == 'true',
     reason="Skipping AHM connection test in CI environment"
 )
-
-def testL_ahm_connection():
+def testL_ahm_connection(pytestconfig):
+    if pytestconfig.getoption("no_AHM"):
+        pytest.skip("AHM connection test skipped by command line option")
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.settimeout(5)  # Set a timeout for the connection
@@ -29,11 +30,6 @@ def testL_ahm_connection():
         print(f"Connection failed: {e}")
         assert False, "Could not connect to AHM server"
         
-# @pytest.mark.skipif(
-#     _connect_status == False, 
-#     reason="Console not connected, skipping test"
-# )
-def test_ahm_connection(get_test_connection):
-    assert get_test_connection
+
 
     
