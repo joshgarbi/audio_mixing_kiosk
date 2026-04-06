@@ -26,3 +26,10 @@
 
     Acts as the interface between the gui helper and the Allen & Heath AHM TCP API. Calls to change channel level pass a int value for level that is combined with the correct hex and sent over the open TCP socket. 
     
+## Helpful Developer Options
+
+### Terminal Commands
+Run the following commands to utilize the local test suite for this project
+| python -m pytest | command line arguments|
+| -------- | -------- |
+| Skip AHM tests when unit is not available | --no-AHM
