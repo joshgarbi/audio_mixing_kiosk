@@ -2,3 +2,4 @@ ttkbootstrap==1.19.2
 pytest==7.4.2
 pythonping==1.1.4
 keyring==25.7.0
+bcrypt==5.0.0
