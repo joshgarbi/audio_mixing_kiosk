@@ -1,4 +1,3 @@
-import pytest
 from password_manager import new_pass, verify_pass
 
 def test_password_hashing_and_verification():
