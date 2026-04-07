@@ -1,4 +1,3 @@
-import bcrypt
 import keyring
 import getpass
 
