@@ -2,7 +2,7 @@ import tkinter as tk  # Add at top of file
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 from PIL import Image, ImageTk
-from uihelper import drawfaderbank, ip_settings
+from uihelper import drawfaderbank, ip_settings, prompt_password
 from ahm_control import initialize_connection, close_connection, restart_connection
 
 ## Most code was generated with ChatGPT 5.2 and rewritten to fit needs
@@ -42,7 +42,7 @@ class SimpleApp:
             master,
             text="⚙",
             bootstyle="secondary",
-            command=self.openSettings,
+            command=lambda: prompt_password(self, master),
         )
         self.settings_button.configure(style="secondary.TButton")
         self.settings_button.place(x=20, y=self.height - 140, width=120, height=120)
