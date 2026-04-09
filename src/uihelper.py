@@ -130,35 +130,34 @@ def getdata(label):
     return data["TCP"][label]
 
 def prompt_password(self, MasterC):
-    self.masterC = MasterC
-    self.password_window = ttk.Toplevel(self.masterC)
-    self.password_window.title("Enter Password")
-    self.password_window.overrideredirect(True)  # Frameless dialog
-    dialog_w, dialog_h = 800, 400
-    pos_x = max(0, (self.width - dialog_w) // 2)
-    pos_y = max(0, (self.height - dialog_h) // 2)
-    self.password_window.geometry(f"{dialog_w}x{dialog_h}+{pos_x}+{pos_y}")
-    self.password_window.resizable(False, False)
-    self.password_window.attributes("-topmost", True)
-    self.password_window.configure(bg="#363C4D")
-    self.password_window.grab_set()  # Make this window modal
+    # Instead of Toplevel, create a Frame on top of the existing MasterC
+    self.password_overlay = ttk.Frame(MasterC, style="Dark.TFrame")
     
-    label = ttk.Label(self.password_window, text="Enter Password", font=("Arial", 18), background="#363C4D", foreground="white")
+    # Place it to cover the entire screen (assuming MasterC is your root/main container)
+    self.password_overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
+    
+    # Create a centered container inside the overlay for the actual "dialog" look
+    dialog_frame = ttk.Frame(self.password_overlay, padding=40, bootstyle="secondary")
+    dialog_frame.place(relx=0.5, rely=0.5, anchor="center", width=800, height=400)
+
+    label = ttk.Label(dialog_frame, text="Enter Password", font=("Arial", 18))
     label.pack(pady=20)
-    self.password_entry = ttk.Entry(self.password_window, show="*", font=("Arial", 16))
-    self.password_entry.pack(pady=10)
     
-    submit_button = ttk.Button(self.password_window, text="Submit", width=16, bootstyle="primary", style="Dialog.TButton", command=lambda: check_password(self=self))
+    self.password_entry = ttk.Entry(dialog_frame, show="*", font=("Arial", 16))
+    self.password_entry.pack(pady=10)
+    self.password_entry.focus_set()
+    
+    submit_button = ttk.Button(dialog_frame, text="Submit", width=16, bootstyle="primary", style="Dialog.TButton", command=lambda: check_password(self=self))
     submit_button.pack(side="left", padx=60, pady=20)
 
-    cancel_button = ttk.Button(self.password_window, text="Cancel", width=16, bootstyle="secondary", style="Dialog.TButton", command=self.password_window.destroy)
+    cancel_button = ttk.Button(dialog_frame, text="Cancel", width=16, bootstyle="secondary", style="Dialog.TButton", command=self.password_overlay.destroy)
     cancel_button.pack(side="right", padx=60, pady=20)
 
 def check_password(self):
     password = self.password_entry.get()
     if verify_pass("admin", password):
         print("Password correct")
-        self.password_window.destroy()
+        self.password_overlay.destroy()
         self.openSettings()
     else:
         self.password_entry.delete(0, tk.END)

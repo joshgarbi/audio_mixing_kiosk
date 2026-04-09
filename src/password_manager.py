@@ -1,6 +1,9 @@
 import bcrypt
 import keyring
 import getpass
+from keyrings.alt.file import PlaintextKeyring
+
+keyring.set_keyring(PlaintextKeyring())
 
 def save_pass(id, hash):
     keyring.set_password("audio_mixing_kiosk", id, hash.decode('utf-8'))
@@ -12,6 +15,7 @@ def new_pass(id, password):
     
 def verify_pass(id, password):
     stored_hash = keyring.get_password("audio_mixing_kiosk", id)
+    
     if not stored_hash:
         return False
     return bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8'))

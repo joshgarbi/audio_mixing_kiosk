@@ -19,6 +19,7 @@ class SimpleApp:
         style.configure("danger.TButton", font=("Arial", 46), padding=16,)
         style.configure("Dialog.TButton", font=("Arial", 18), padding=12)
         style.configure("secondary.TButton", font=("Arial", 36), padding=12)
+        style.configure("tertiary.TButton", font=("Arial", 46), padding=16, background="#0082ec", hoverbackground="#007add")
         style.configure("tertiary.TFrame", background="#1e1e1e")
         
         drawfaderbank(self, master)
@@ -49,48 +50,36 @@ class SimpleApp:
         
         
     def quit_app(self):
-        sure_window = ttk.Toplevel(self.master)
-        sure_window.title("Confirm Exit")
-        # Frameless dialog
-        sure_window.overrideredirect(True)
-
-        dialog_w, dialog_h = 800, 300
-        pos_x = max(0, (self.width - dialog_w) // 2)
-        pos_y = max(0, (self.height - dialog_h) // 2)
-        sure_window.geometry(f"{dialog_w}x{dialog_h}+{pos_x}+{pos_y}")
-        sure_window.resizable(False, False)
-        sure_window.attributes("-topmost", True)
+        # Create the full-screen overlay to block the main UI
+        self.exit_overlay = ttk.Frame(self.master, style="Dark.TFrame")
+        self.exit_overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
+    
+        # Create the centered "dialog" box inside the overlay
+        dialog_frame = ttk.Frame(self.exit_overlay, padding=40, bootstyle="secondary")
+        dialog_frame.place(relx=0.5, rely=0.5, anchor="center", width=1200, height=500)
         
-        sure_window.configure(bg="#363C4D")
-        sure_window.grab_set()  # Make this window modal
-        
-        label = ttk.Label(sure_window, text="Power Off?", font=("Arial", 24), background="#363C4D", foreground="white")
+        label = ttk.Label(dialog_frame, text="Power Off?", font=("Arial", 32), bootstyle="inverse-secondary", foreground="white")
         label.pack(pady=20)
-        yes_button = ttk.Button(sure_window, width=16, text="Shut Down", bootstyle="danger", style="Dialog.TButton", command=self.shutdown)
+        
+        yes_button = ttk.Button(dialog_frame, width=10, text="Shut Down", bootstyle="danger", command=self.shutdown)
         yes_button.pack(side="left", padx=30, pady=16)
-        no_button = ttk.Button(sure_window, width=16, text="Cancel", bootstyle="secondary", style="Dialog.TButton", command=sure_window.destroy)
+        no_button = ttk.Button(dialog_frame, width=24, text="Cancel", style="tertiary.TButton", command=self.exit_overlay.destroy)
         no_button.pack(side="right", padx=30, pady=16)
         
     def openSettings(self):
-        settings_window = ttk.Toplevel(self.master)
-        settings_window.title("Settings")
-        settings_window.overrideredirect(True)  # Frameless dialog
+        self.settings_window = ttk.Frame(self.master, style="Dark.TFrame")
+        self.settings_window.place(relx=0, rely=0, relwidth=1, relheight=1)
         
-        settings_window.geometry(f"{self.width}x{self.height}+0+0")
-        settings_window.resizable(False, False)
-        settings_window.attributes("-topmost", True)
         
-        settings_window.configure(bg="#363C4D")
-        settings_window.grab_set()  # Make this window modal
         
-        label = ttk.Label(settings_window, text="Settings", font=("Arial", 24), background="#363C4D", foreground="white")
+        label = ttk.Label(self.settings_window, text="Settings", font=("Arial", 24), background="#363C4D", foreground="white")
         label.pack(pady=20)
-        escape_button = ttk.Button(settings_window, width=16, text="Close Settings", bootstyle="secondary", style="Dialog.TButton", command=settings_window.destroy)
+        escape_button = ttk.Button(self.settings_window, width=16, text="Close Settings", bootstyle="secondary", style="Dialog.TButton", command=self.settings_window.destroy)
         escape_button.pack(side="bottom", padx=30, pady=16)
         
         # settings_menu()
         
-        ip_settings(self, settings_window)
+        ip_settings(self, self.settings_window)
 
     def shutdown(self):
         close_connection()
