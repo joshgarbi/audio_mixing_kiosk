@@ -4,7 +4,7 @@ from ttkbootstrap.constants import *
 import json
 from fader import FaderManager
 from ahm_control import test_connection, restart_connection
-
+from password_manager import verify_pass
 
 
 
@@ -128,3 +128,40 @@ def getdata(label):
         data = json.load(jsonfile)
 
     return data["TCP"][label]
+
+def prompt_password(self, MasterC):
+    # Instead of Toplevel, create a Frame on top of the existing MasterC
+    self.password_overlay = ttk.Frame(MasterC, style="Dark.TFrame")
+    
+    # Place it to cover the entire screen (assuming MasterC is your root/main container)
+    self.password_overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
+    
+    # Create a centered container inside the overlay for the actual "dialog" look
+    dialog_frame = ttk.Frame(self.password_overlay, padding=40, bootstyle="secondary")
+    dialog_frame.place(relx=0.5, rely=0.5, anchor="center", width=800, height=400)
+
+    label = ttk.Label(dialog_frame, text="Enter Password", font=("Arial", 18))
+    label.pack(pady=20)
+    
+    self.password_entry = ttk.Entry(dialog_frame, show="*", font=("Arial", 16))
+    self.password_entry.pack(pady=10)
+    self.password_entry.focus_set()
+    
+    submit_button = ttk.Button(dialog_frame, text="Submit", width=16, bootstyle="primary", style="Dialog.TButton", command=lambda: check_password(self=self))
+    submit_button.pack(side="left", padx=60, pady=20)
+
+    cancel_button = ttk.Button(dialog_frame, text="Cancel", width=16, bootstyle="secondary", style="Dialog.TButton", command=self.password_overlay.destroy)
+    cancel_button.pack(side="right", padx=60, pady=20)
+
+def check_password(self):
+    password = self.password_entry.get()
+    if verify_pass("admin", password):
+        print("Password correct")
+        self.password_overlay.destroy()
+        self.openSettings()
+    else:
+        self.password_entry.delete(0, tk.END)
+        self.password_entry.configure(style="Red.TEntry")
+        
+    
+    
