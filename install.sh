@@ -1,6 +1,6 @@
 set -e
 
-echo "--- Starting Kiosk Setup ---"
+echo "--- Starting Kiosk Setup v1.0 ---"
 
 echo "Installing system packages..."
 sudo apt update
