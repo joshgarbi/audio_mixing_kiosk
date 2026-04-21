@@ -10,6 +10,7 @@ from ahm_control import initialize_connection, close_connection, restart_connect
 class SimpleApp:
     def __init__(self, width, height, master):
         self.master = master
+        self.master.configure(cursor="none")
         
         self.width = width     
         self.height = height   
@@ -90,6 +91,7 @@ class SimpleApp:
 if __name__ == "__main__":
     # kiosk features:
     app = ttk.Window(themename="darkly", scaling=1.5) 
+    app.configure(cursor="none")
     # width = app.winfo_screenwidth()
     # height = app.winfo_screenheight()
     width = 800
