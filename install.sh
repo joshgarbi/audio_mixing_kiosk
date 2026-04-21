@@ -4,7 +4,7 @@ echo "--- Starting Kiosk Setup ---"
 
 echo "Installing system packages..."
 sudo apt update
-sudo apt install -y python3-pip python3-venv python3-tk cage xwayland libgl1-mesa-dri unclutter
+sudo apt install -y python3-pip python3-venv python3-tk cage xwayland libgl1-mesa-dri
 
 # 2. Setup Python Virtual Environment
 echo "Setting up Python environment..."
