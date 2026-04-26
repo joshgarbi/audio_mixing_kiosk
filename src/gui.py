@@ -90,6 +90,7 @@ class SimpleApp:
 if __name__ == "__main__":
     # kiosk features:
     app = ttk.Window(themename="darkly", scaling=1.5) 
+    app.config(cursor="none")  # Hide the mouse cursor
     # width = app.winfo_screenwidth()
     # height = app.winfo_screenheight()
     width = 800
