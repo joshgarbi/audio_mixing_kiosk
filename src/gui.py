@@ -4,8 +4,6 @@ from ttkbootstrap.constants import *
 from PIL import Image, ImageTk
 from uihelper import drawfaderbank, ip_settings, prompt_password
 from ahm_control import initialize_connection, close_connection, restart_connection
-import os
-import subprocess
 
 ## Most code was generated with ChatGPT 5.2 and rewritten to fit needs
 
@@ -103,13 +101,4 @@ if __name__ == "__main__":
     app.attributes("-fullscreen", True)
     app.resizable(False, False)
     app.protocol("WM_DELETE_WINDOW", lambda: None)  # Disable window closing
-    
-    env = os.environ.copy()
-    subprocess.Popen(
-        ["unclutter-xfixes", "--timeout", "0"],
-        env=env,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
-    )
-    
     app.mainloop()
