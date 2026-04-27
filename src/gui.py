@@ -16,16 +16,16 @@ class SimpleApp:
         
         style = ttk.Style()
         # Configure a red (danger) button style with larger font/padding
-        style.configure("danger.TButton", font=("Arial", 46), padding=16,)
-        style.configure("Dialog.TButton", font=("Arial", 18), padding=12)
-        style.configure("secondary.TButton", font=("Arial", 36), padding=12)
-        style.configure("tertiary.TButton", font=("Arial", 46), padding=16, background="#0082ec", hoverbackground="#007add")
+        style.configure("danger.TButton", font=("Arial", 24), padding=8,)
+        style.configure("Dialog.TButton", font=("Arial", 14), padding=8)
+        style.configure("secondary.TButton", font=("Arial", 20), padding=8)
+        style.configure("tertiary.TButton", font=("Arial", 20), padding=8, background="#0082ec", hoverbackground="#007add")
         style.configure("tertiary.TFrame", background="#1e1e1e")
         
         drawfaderbank(self, master)
         
         pil_image = Image.open("resources/power.png")
-        pil_image = pil_image.resize((75, 75))
+        pil_image = pil_image.resize((48, 48))
         self.tk_image = ImageTk.PhotoImage(pil_image)
 
         self.button = ttk.Button(
@@ -36,7 +36,7 @@ class SimpleApp:
         )
 
         self.button.configure(style="danger.TButton")
-        self.button.place(x=20, y=20, width=120, height=120)
+        self.button.place(x=12, y=12, width=84, height=84)
         
         ## settings button in bottom left to open settings
         self.settings_button = ttk.Button(
@@ -46,7 +46,7 @@ class SimpleApp:
             command=lambda: prompt_password(self, master),
         )
         self.settings_button.configure(style="secondary.TButton")
-        self.settings_button.place(x=20, y=self.height - 140, width=120, height=120)
+        self.settings_button.place(x=12, y=self.height - 96, width=84, height=84)
         
         
     def quit_app(self):
@@ -56,15 +56,15 @@ class SimpleApp:
     
         # Create the centered "dialog" box inside the overlay
         dialog_frame = ttk.Frame(self.exit_overlay, padding=40, bootstyle="secondary")
-        dialog_frame.place(relx=0.5, rely=0.5, anchor="center", width=1200, height=500)
+        dialog_frame.place(relx=0.5, rely=0.5, anchor="center", width=min(680, self.width - 40), height=min(340, self.height - 40))
         
-        label = ttk.Label(dialog_frame, text="Power Off?", font=("Arial", 32), bootstyle="inverse-secondary", foreground="white")
-        label.pack(pady=20)
+        label = ttk.Label(dialog_frame, text="Power Off?", font=("Arial", 24), bootstyle="inverse-secondary", foreground="white")
+        label.pack(pady=16)
         
         yes_button = ttk.Button(dialog_frame, width=10, text="Shut Down", bootstyle="danger", command=self.shutdown)
-        yes_button.pack(side="left", padx=30, pady=16)
-        no_button = ttk.Button(dialog_frame, width=24, text="Cancel", style="tertiary.TButton", command=self.exit_overlay.destroy)
-        no_button.pack(side="right", padx=30, pady=16)
+        yes_button.pack(side="left", padx=20, pady=16)
+        no_button = ttk.Button(dialog_frame, width=12, text="Cancel", style="tertiary.TButton", command=self.exit_overlay.destroy)
+        no_button.pack(side="right", padx=20, pady=16)
         
     def openSettings(self):
         self.settings_window = ttk.Frame(self.master, style="Dark.TFrame")
@@ -92,8 +92,8 @@ if __name__ == "__main__":
     app = ttk.Window(themename="darkly", scaling=1.5) 
     # width = app.winfo_screenwidth()
     # height = app.winfo_screenheight()
-    width = 1280
-    height = 720
+    width = 800
+    height = 480
     print(f"Screen size: {width}x{height}")
     initialize_connection()  # Establish AHM connection at startup
     SimpleApp(width, height, app)
