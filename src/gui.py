@@ -2,7 +2,7 @@ import tkinter as tk  # Add at top of file
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 from PIL import Image, ImageTk
-from uihelper import drawfaderbank, ip_settings
+from uihelper import drawfaderbank, ip_settings, prompt_password
 from ahm_control import initialize_connection, close_connection, restart_connection
 
 ## Most code was generated with ChatGPT 5.2 and rewritten to fit needs
@@ -16,15 +16,16 @@ class SimpleApp:
         
         style = ttk.Style()
         # Configure a red (danger) button style with larger font/padding
-        style.configure("danger.TButton", font=("Arial", 46), padding=16,)
-        style.configure("Dialog.TButton", font=("Arial", 18), padding=12)
-        style.configure("secondary.TButton", font=("Arial", 36), padding=12)
+        style.configure("danger.TButton", font=("Arial", 24), padding=8,)
+        style.configure("Dialog.TButton", font=("Arial", 14), padding=8)
+        style.configure("secondary.TButton", font=("Arial", 20), padding=8)
+        style.configure("tertiary.TButton", font=("Arial", 20), padding=8, background="#0082ec", hoverbackground="#007add")
         style.configure("tertiary.TFrame", background="#1e1e1e")
         
         drawfaderbank(self, master)
         
         pil_image = Image.open("resources/power.png")
-        pil_image = pil_image.resize((75, 75))
+        pil_image = pil_image.resize((48, 48))
         self.tk_image = ImageTk.PhotoImage(pil_image)
 
         self.button = ttk.Button(
@@ -35,62 +36,50 @@ class SimpleApp:
         )
 
         self.button.configure(style="danger.TButton")
-        self.button.place(x=20, y=20, width=120, height=120)
+        self.button.place(x=12, y=12, width=84, height=84)
         
         ## settings button in bottom left to open settings
         self.settings_button = ttk.Button(
             master,
             text="⚙",
             bootstyle="secondary",
-            command=self.openSettings,
+            command=lambda: prompt_password(self, master),
         )
         self.settings_button.configure(style="secondary.TButton")
-        self.settings_button.place(x=20, y=self.height - 140, width=120, height=120)
+        self.settings_button.place(x=12, y=self.height - 96, width=84, height=84)
         
         
     def quit_app(self):
-        sure_window = ttk.Toplevel(self.master)
-        sure_window.title("Confirm Exit")
-        # Frameless dialog
-        sure_window.overrideredirect(True)
-
-        dialog_w, dialog_h = 800, 300
-        pos_x = max(0, (self.width - dialog_w) // 2)
-        pos_y = max(0, (self.height - dialog_h) // 2)
-        sure_window.geometry(f"{dialog_w}x{dialog_h}+{pos_x}+{pos_y}")
-        sure_window.resizable(False, False)
-        sure_window.attributes("-topmost", True)
+        # Create the full-screen overlay to block the main UI
+        self.exit_overlay = ttk.Frame(self.master, style="Dark.TFrame")
+        self.exit_overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
+    
+        # Create the centered "dialog" box inside the overlay
+        dialog_frame = ttk.Frame(self.exit_overlay, padding=40, bootstyle="secondary")
+        dialog_frame.place(relx=0.5, rely=0.5, anchor="center", width=min(680, self.width - 40), height=min(340, self.height - 40))
         
-        sure_window.configure(bg="#363C4D")
-        sure_window.grab_set()  # Make this window modal
+        label = ttk.Label(dialog_frame, text="Power Off?", font=("Arial", 24), bootstyle="inverse-secondary", foreground="white")
+        label.pack(pady=16)
         
-        label = ttk.Label(sure_window, text="Power Off?", font=("Arial", 24), background="#363C4D", foreground="white")
-        label.pack(pady=20)
-        yes_button = ttk.Button(sure_window, width=16, text="Shut Down", bootstyle="danger", style="Dialog.TButton", command=self.shutdown)
-        yes_button.pack(side="left", padx=30, pady=16)
-        no_button = ttk.Button(sure_window, width=16, text="Cancel", bootstyle="secondary", style="Dialog.TButton", command=sure_window.destroy)
-        no_button.pack(side="right", padx=30, pady=16)
+        yes_button = ttk.Button(dialog_frame, width=10, text="Shut Down", bootstyle="danger", command=self.shutdown)
+        yes_button.pack(side="left", padx=20, pady=16)
+        no_button = ttk.Button(dialog_frame, width=12, text="Cancel", style="tertiary.TButton", command=self.exit_overlay.destroy)
+        no_button.pack(side="right", padx=20, pady=16)
         
     def openSettings(self):
-        settings_window = ttk.Toplevel(self.master)
-        settings_window.title("Settings")
-        settings_window.overrideredirect(True)  # Frameless dialog
+        self.settings_window = ttk.Frame(self.master, style="Dark.TFrame")
+        self.settings_window.place(relx=0, rely=0, relwidth=1, relheight=1)
         
-        settings_window.geometry(f"{self.width}x{self.height}+0+0")
-        settings_window.resizable(False, False)
-        settings_window.attributes("-topmost", True)
         
-        settings_window.configure(bg="#363C4D")
-        settings_window.grab_set()  # Make this window modal
         
-        label = ttk.Label(settings_window, text="Settings", font=("Arial", 24), background="#363C4D", foreground="white")
+        label = ttk.Label(self.settings_window, text="Settings", font=("Arial", 24), background="#363C4D", foreground="white")
         label.pack(pady=20)
-        escape_button = ttk.Button(settings_window, width=16, text="Close Settings", bootstyle="secondary", style="Dialog.TButton", command=settings_window.destroy)
+        escape_button = ttk.Button(self.settings_window, width=16, text="Close Settings", bootstyle="secondary", style="Dialog.TButton", command=self.settings_window.destroy)
         escape_button.pack(side="bottom", padx=30, pady=16)
         
         # settings_menu()
         
-        ip_settings(self, settings_window)
+        ip_settings(self, self.settings_window)
 
     def shutdown(self):
         close_connection()
@@ -103,8 +92,8 @@ if __name__ == "__main__":
     app = ttk.Window(themename="darkly", scaling=1.5) 
     # width = app.winfo_screenwidth()
     # height = app.winfo_screenheight()
-    width = 1280
-    height = 720
+    width = 800
+    height = 480
     print(f"Screen size: {width}x{height}")
     initialize_connection()  # Establish AHM connection at startup
     SimpleApp(width, height, app)

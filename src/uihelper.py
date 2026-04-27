@@ -4,7 +4,7 @@ from ttkbootstrap.constants import *
 import json
 from fader import FaderManager
 from ahm_control import test_connection, restart_connection
-
+from password_manager import verify_pass
 
 
 
@@ -29,7 +29,8 @@ def ip_settings(self, masterC):
     style.configure("Green.TLabel", foreground="green")
 
     ip_frame = ttk.Frame(masterC)
-    ip_frame.place(x=10, y=10, width=400, height=200)
+    frame_width = min(500, self.width - 40)
+    ip_frame.place(relx=0.5, rely=0.2, anchor="n", width=frame_width, height=84)
 
     vip_cmd = (ip_frame.register(lambda p: validate_ip(self, p)), '%P')
     vport_cmd = (ip_frame.register(lambda p: validate_port(self, p)), '%P')
@@ -44,8 +45,8 @@ def ip_settings(self, masterC):
     ipSettings.delete(0, tk.END)
     ipSettings.insert(0, getdata('ip_address'))
 
-    ipSettings.configure(font=36)
-    ipSettings.place(x=5, y=5, width=200, height=50)
+    ipSettings.configure(font=("Arial", 18))
+    ipSettings.place(x=5, y=5, width=220, height=40)
     
     portSettings = ttk.Entry(
         ip_frame,
@@ -56,15 +57,15 @@ def ip_settings(self, masterC):
     portSettings.delete(0, tk.END)
     portSettings.insert(0, getdata('port'))
     
-    portSettings.configure(font=36)
-    portSettings.place(x=210, y = 5, width=100, height=50)
+    portSettings.configure(font=("Arial", 18))
+    portSettings.place(x=230, y = 5, width=100, height=40)
     
     self.connectionStatus = ttk.Label(
         ip_frame,
         text="STATUS",
     )
-    self.connectionStatus.configure(font=36)
-    self.connectionStatus.place(x=315, y=5, width=80, height=50)
+    self.connectionStatus.configure(font=("Arial", 16))
+    self.connectionStatus.place(x=335, y=5, width=100, height=40)
 
     if test_connection() != None:
         self.connectionStatus.configure(style="Green.TLabel")
@@ -128,3 +129,40 @@ def getdata(label):
         data = json.load(jsonfile)
 
     return data["TCP"][label]
+
+def prompt_password(self, MasterC):
+    # Instead of Toplevel, create a Frame on top of the existing MasterC
+    self.password_overlay = ttk.Frame(MasterC, style="Dark.TFrame")
+    
+    # Place it to cover the entire screen (assuming MasterC is your root/main container)
+    self.password_overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
+    
+    # Create a centered container inside the overlay for the actual "dialog" look
+    dialog_frame = ttk.Frame(self.password_overlay, padding=40, bootstyle="secondary")
+    dialog_frame.place(relx=0.5, rely=0.5, anchor="center", width=min(720, self.width - 40), height=min(320, self.height - 40))
+
+    label = ttk.Label(dialog_frame, text="Enter Password", font=("Arial", 16))
+    label.pack(pady=16)
+    
+    self.password_entry = ttk.Entry(dialog_frame, show="*", font=("Arial", 14))
+    self.password_entry.pack(pady=8)
+    self.password_entry.focus_set()
+    
+    submit_button = ttk.Button(dialog_frame, text="Submit", width=12, bootstyle="primary", style="Dialog.TButton", command=lambda: check_password(self=self))
+    submit_button.pack(side="left", padx=24, pady=16)
+
+    cancel_button = ttk.Button(dialog_frame, text="Cancel", width=12, bootstyle="secondary", style="Dialog.TButton", command=self.password_overlay.destroy)
+    cancel_button.pack(side="right", padx=24, pady=16)
+
+def check_password(self):
+    password = self.password_entry.get()
+    if verify_pass("admin", password):
+        print("Password correct")
+        self.password_overlay.destroy()
+        self.openSettings()
+    else:
+        self.password_entry.delete(0, tk.END)
+        self.password_entry.configure(style="Red.TEntry")
+        
+    
+    
