@@ -23,3 +23,11 @@ fi
 # 4. Permissions
 echo "Setting hardware permissions..."
 sudo usermod -aG video,render $USER
+
+# 5. Remove cursor icon if exists
+echo "Removing cursor icon..."
+# Backup the original cursor just in case
+sudo mv /usr/share/icons/Adwaita/cursors/left_ptr /usr/share/icons/Adwaita/cursors/left_ptr.bak
+
+# Create a symlink to a non-existent or empty file
+sudo ln -s /dev/null /usr/share/icons/Adwaita/cursors/left_ptr
