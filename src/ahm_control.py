@@ -115,3 +115,54 @@ def getCHlevel(fader):
             print(f'Error: {e}')
             return -1
     return -1
+
+def setCHgain(value, fader):
+    SETLEVEL = bytes([0xB0, 0x63, fader, 0xB0, 0x62, 0x19, 0xB0, 0x06]) 
+    if _socket:
+        try:
+            scaled_value = int(value * 127 / 100) # Ensure 100 maps to 127, not 126
+            level_byte = bytes([scaled_value])
+            _socket.sendall(SETLEVEL + level_byte)
+            # time.sleep(0.1)
+        except Exception as e:
+            print(f'Error: {e}')
+
+def getCHgain(fader):
+    GETLEVEL = SYSEX_HEADER + bytes([0x00, 0x01, 0x0B, 0x19, fader, 0xF7])
+    if _socket:
+        try:
+            _socket.sendall(GETLEVEL)
+            data = _socket.recv(16)
+            return data[6] * 100 / 127
+        except Exception as e:
+            print(f'Error: {e}')
+            return -1
+    return -1
+
+
+def getCHpPower(fader):
+    GETPPOWER = SYSEX_HEADER + bytes([0x00, 0x01, 0x0B, 0x1B, fader, 0xF7])
+    if _socket:
+        try:
+            _socket.sendall(GETPPOWER)
+            data = _socket.recv(16)
+            return data[6]
+        except Exception as e:
+            print(f'Error: {e}')
+            return False
+    return False
+
+def toggleCHpPower(fader): 
+    pPowerOff = bytes([0xB0, 0x63, fader, 0xB0, 0x62, 0x1B, 0xB0, 0x06, 0x00])
+    pPowerOn = bytes([0xB0, 0x63, fader, 0xB0, 0x62, 0x1B, 0xB0, 0x06, 0x7F])
+    state = getCHpPower(fader)
+    if _socket:
+        try:
+            if state == 0x7F:
+                _socket.sendall(pPowerOff)
+            else:
+                _socket.sendall(pPowerOn)
+        except Exception as e:
+            print(f'Error: {e}')
+            
+
