@@ -1,9 +1,6 @@
 """Tests for AHM TCP connection and control functions."""
 import json
-import os
-import socket
-import pytest
-from ahm_control import initialize_connection, close_connection, test_connection
+from ahm_control import initialize_connection, close_connection, getCHlevel, test_connection, toggleCHpPower, getCHpPower
 
 _CONNECT_STATUS = False
 
@@ -33,6 +30,12 @@ def test_l_ahm_connection(pytestconfig):
         print(f"Connection failed: {e}")
         assert False, "Could not connect to AHM server"
         
-
-
+def test_phantom_power():
+    init_status = getCHpPower()
+    toggleCHpPower()
+    new_status = getCHpPower()
+    assert init_status != new_status, "Phantom power state did not toggle"
+    toggleCHpPower()  # Toggle back to original state
+    final_status = getCHpPower()
+    assert final_status == init_status, "Phantom power state did not return to original value"
     

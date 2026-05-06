@@ -3,8 +3,10 @@ import tkinter as tk
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import LEFT
 from PIL import Image, ImageTk
-from uihelper import drawfaderbank, ip_settings, prompt_password
-from ahm_control import initialize_connection, close_connection
+from uihelper import drawfaderbank, ip_settings, preamp_settings, prompt_password
+from ahm_control import initialize_connection, close_connection, restart_connection
+
+## Most code was generated with ChatGPT 5.2 and rewritten to fit needs
 
 class SimpleApp:
     """Main application window for audio mixing kiosk."""
@@ -29,7 +31,11 @@ class SimpleApp:
             hoverbackground="#007add",
         )
         style.configure("tertiary.TFrame", background="#1e1e1e")
-        
+        style.configure("phmpOn.TButton", font=("Arial", 14), padding=0, background="#6A0DAD", bordercolor="#6A0DAD")
+        style.configure("phmpOff.TButton", font=("Arial", 14), padding=0, background="#363C4D", bordercolor="#363C4D")
+        style.configure("phmpTest.TButton", font=("Arial", 14), padding=0, background="#FF0077", bordercolor="#FF3974")
+    
+    
         drawfaderbank(self, master)
 
         pil_image = Image.open("resources/power.png")
@@ -120,6 +126,7 @@ class SimpleApp:
         escape_button.pack(side="bottom", padx=30, pady=16)
 
         ip_settings(self, self.settings_window)
+        preamp_settings(self, self.settings_window)
 
     def shutdown(self):
         """Close AHM connection and shut down application."""

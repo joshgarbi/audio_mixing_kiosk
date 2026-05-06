@@ -120,5 +120,6 @@ class Fader:
         noise = random.randint(-5, 5)
         level += noise
         self.level1.set_level(level)
-        self.master.after(self.update_interval, self.update_fader_level)
+        self.master.after(self.update_interval, self.updateFaderLevel)
+        
     
