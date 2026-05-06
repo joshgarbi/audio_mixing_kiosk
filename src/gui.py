@@ -1,6 +1,7 @@
-import tkinter as tk  # Add at top of file
+"""Main GUI application for audio mixing kiosk interface."""
+import tkinter as tk
 import ttkbootstrap as ttk
-from ttkbootstrap.constants import *
+from ttkbootstrap.constants import LEFT
 from PIL import Image, ImageTk
 from uihelper import drawfaderbank, ip_settings, preamp_settings, prompt_password
 from ahm_control import initialize_connection, close_connection, restart_connection
@@ -8,18 +9,27 @@ from ahm_control import initialize_connection, close_connection, restart_connect
 ## Most code was generated with ChatGPT 5.2 and rewritten to fit needs
 
 class SimpleApp:
+    """Main application window for audio mixing kiosk."""
+
     def __init__(self, width, height, master):
+        """Initialize the application with UI components."""
         self.master = master
-        
-        self.width = width     
+
+        self.width = width
         self.height = height   
         
         style = ttk.Style()
-        # Configure a red (danger) button style with larger font/padding
-        style.configure("danger.TButton", font=("Arial", 24), padding=8,)
+        # Configure button styles
+        style.configure("danger.TButton", font=("Arial", 24), padding=8)
         style.configure("Dialog.TButton", font=("Arial", 14), padding=8)
         style.configure("secondary.TButton", font=("Arial", 20), padding=8)
-        style.configure("tertiary.TButton", font=("Arial", 20), padding=8, background="#0082ec", hoverbackground="#007add")
+        style.configure(
+            "tertiary.TButton",
+            font=("Arial", 20),
+            padding=8,
+            background="#0082ec",
+            hoverbackground="#007add",
+        )
         style.configure("tertiary.TFrame", background="#1e1e1e")
         style.configure("phmpOn.TButton", font=("Arial", 14), padding=0, background="#6A0DAD", bordercolor="#6A0DAD")
         style.configure("phmpOff.TButton", font=("Arial", 14), padding=0, background="#363C4D", bordercolor="#363C4D")
@@ -27,7 +37,7 @@ class SimpleApp:
     
     
         drawfaderbank(self, master)
-        
+
         pil_image = Image.open("resources/power.png")
         pil_image = pil_image.resize((48, 48))
         self.tk_image = ImageTk.PhotoImage(pil_image)
@@ -36,13 +46,13 @@ class SimpleApp:
             master,
             image=self.tk_image,
             bootstyle="danger",
-            command=self.quit_app,  
+            command=self.quit_app,
         )
 
         self.button.configure(style="danger.TButton")
         self.button.place(x=12, y=12, width=84, height=84)
-        
-        ## settings button in bottom left to open settings
+
+        # Settings button in bottom left
         self.settings_button = ttk.Button(
             master,
             text="⚙",
@@ -50,53 +60,82 @@ class SimpleApp:
             command=lambda: prompt_password(self, master),
         )
         self.settings_button.configure(style="secondary.TButton")
-        self.settings_button.place(x=12, y=self.height - 96, width=84, height=84)
-        
-        
+        self.settings_button.place(
+            x=12, y=self.height - 96, width=84, height=84
+        )
     def quit_app(self):
+        """Show power-off confirmation dialog."""
         # Create the full-screen overlay to block the main UI
         self.exit_overlay = ttk.Frame(self.master, style="Dark.TFrame")
         self.exit_overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
-    
-        # Create the centered "dialog" box inside the overlay
+
+        # Create the centered dialog
         dialog_frame = ttk.Frame(self.exit_overlay, padding=40, bootstyle="secondary")
-        dialog_frame.place(relx=0.5, rely=0.5, anchor="center", width=min(680, self.width - 40), height=min(340, self.height - 40))
-        
-        label = ttk.Label(dialog_frame, text="Power Off?", font=("Arial", 24), bootstyle="inverse-secondary", foreground="white")
+        dialog_frame.place(
+            relx=0.5,
+            rely=0.5,
+            anchor="center",
+            width=min(680, self.width - 40),
+            height=min(340, self.height - 40),
+        )
+
+        label = ttk.Label(
+            dialog_frame,
+            text="Power Off?",
+            font=("Arial", 24),
+            bootstyle="inverse-secondary",
+            foreground="white",
+        )
         label.pack(pady=16)
-        
-        yes_button = ttk.Button(dialog_frame, width=10, text="Shut Down", bootstyle="danger", command=self.shutdown)
+
+        yes_button = ttk.Button(
+            dialog_frame, width=10, text="Shut Down", bootstyle="danger",
+            command=self.shutdown
+        )
         yes_button.pack(side="left", padx=20, pady=16)
-        no_button = ttk.Button(dialog_frame, width=12, text="Cancel", style="tertiary.TButton", command=self.exit_overlay.destroy)
+        no_button = ttk.Button(
+            dialog_frame,
+            width=12,
+            text="Cancel",
+            style="tertiary.TButton",
+            command=self.exit_overlay.destroy,
+        )
         no_button.pack(side="right", padx=20, pady=16)
-        
-    def openSettings(self):
+
+    def open_settings(self):
+        """Open settings panel overlay."""
         self.settings_window = ttk.Frame(self.master, style="Dark.TFrame")
         self.settings_window.place(relx=0, rely=0, relwidth=1, relheight=1)
-        
-        
-        
-        label = ttk.Label(self.settings_window, text="Settings", font=("Arial", 24), background="#363C4D", foreground="white")
+
+        label = ttk.Label(
+            self.settings_window,
+            text="Settings",
+            font=("Arial", 24),
+            background="#363C4D",
+            foreground="white",
+        )
         label.pack(pady=20)
-        escape_button = ttk.Button(self.settings_window, width=16, text="Close Settings", bootstyle="secondary", style="Dialog.TButton", command=self.settings_window.destroy)
+        escape_button = ttk.Button(
+            self.settings_window,
+            width=16,
+            text="Close Settings",
+            bootstyle="secondary",
+            style="Dialog.TButton",
+            command=self.settings_window.destroy,
+        )
         escape_button.pack(side="bottom", padx=30, pady=16)
-        
-        # settings_menu()
-        
+
         ip_settings(self, self.settings_window)
         preamp_settings(self, self.settings_window)
 
     def shutdown(self):
+        """Close AHM connection and shut down application."""
         close_connection()
         self.master.destroy()
 
-    print()
-        
 if __name__ == "__main__":
-    # kiosk features:
-    app = ttk.Window(themename="darkly", scaling=1.5) 
-    # width = app.winfo_screenwidth()
-    # height = app.winfo_screenheight()
+    # Kiosk features
+    app = ttk.Window(themename="darkly", scaling=1.5)
     width = 800
     height = 480
     print(f"Screen size: {width}x{height}")
