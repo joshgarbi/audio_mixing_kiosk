@@ -2,7 +2,7 @@ import pytest
 import socket
 import os
 import json
-from ahm_control import initialize_connection, close_connection, getCHlevel, test_connection
+from ahm_control import initialize_connection, close_connection, getCHlevel, test_connection, toggleCHpPower, getCHpPower
 
 _connect_status = False
 
@@ -30,6 +30,12 @@ def testL_ahm_connection(pytestconfig):
         print(f"Connection failed: {e}")
         assert False, "Could not connect to AHM server"
         
-
-
+def test_phantom_power():
+    init_status = getCHpPower()
+    toggleCHpPower()
+    new_status = getCHpPower()
+    assert init_status != new_status, "Phantom power state did not toggle"
+    toggleCHpPower()  # Toggle back to original state
+    final_status = getCHpPower()
+    assert final_status == init_status, "Phantom power state did not return to original value"
     

@@ -9,35 +9,40 @@
                 20,
                 20
             ],
-            "ch": 0
+            "ch": 0,
+            "phmp": 0
         },
         "fader2": {
             "position": [
                 220,
                 20
             ],
-            "ch": 1
+            "ch": 1,
+            "phmp": 0
         },
         "fader3": {
             "position": [
                 420,
                 20
             ],
-            "ch": 2
+            "ch": 2,
+            "phmp": 0
         },
         "fader4": {
             "position": [
                 620,
                 20
             ],
-            "ch": 3
+            "ch": 3,
+            "phmp": 0
         },
         "fader5": {
             "position": [
                 820,
                 20
             ],
-            "ch": 4
+            "ch": 4,
+            "phmp": 0
         }
     }
 }

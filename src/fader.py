@@ -90,4 +90,5 @@ class Fader:
         level += noise
         self.level1.set_level(level)
         self.master.after(self.update_interval, self.updateFaderLevel)
+        
     
