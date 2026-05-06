@@ -1,9 +1,10 @@
 import ttkbootstrap as ttk
 import tkinter as tk
+from ttkbootstrap import style
 from ttkbootstrap.constants import *
 import json
 from fader import FaderManager
-from ahm_control import test_connection, restart_connection
+from ahm_control import test_connection, restart_connection, toggleCHpPower, getCHpPower
 from password_manager import verify_pass
 
 
@@ -71,6 +72,38 @@ def ip_settings(self, masterC):
         self.connectionStatus.configure(style="Green.TLabel")
     else:
         self.connectionStatus.configure(style="Red.TLabel")
+        
+def preamp_settings(self, masterC):
+    
+    with open('src/cfg.json', 'r') as jsonfile:
+        data = json.load(jsonfile)
+        
+    faders = data["BANK"]
+        
+    preamp_frame = ttk.Frame(masterC)
+    frame_width = self.width - 40
+    preamp_frame.place(relx=0.5, rely=0.4, anchor="n", width=frame_width, height=74)
+
+    button_size = 52
+    button_gap = 10
+    start_x = 10
+
+    for index, fader in enumerate(faders):
+        ch = data["BANK"][fader]["ch"]
+        label = str(ch)
+        setattr(self, f"toggle_{fader}", ttk.Button(
+            preamp_frame,
+            text=label,
+            bootstyle="secondary",
+            command=lambda fader=fader: toggle_preamp(self, fader, data["BANK"][fader]["ch"])
+        ))
+        getattr(self, f"toggle_{fader}").configure(style="phmpOff.TButton")
+        x_pos = start_x + index * (button_size + button_gap)
+        getattr(self, f"toggle_{fader}").place(x=x_pos, y=10, width=button_size, height=button_size)
+        
+    
+        
+    
         
 def handle_reconnection(self):
     self.connectionStatus.configure(style="Red.TLabel")
@@ -165,4 +198,17 @@ def check_password(self):
         self.password_entry.configure(style="Red.TEntry")
         
     
+def toggle_preamp(self, fader, ch):
+    toggleCHpPower(int(ch))
+    
+    
+    if 0 <= getCHpPower(ch) <= 63:
+        print(f"Preamp for {fader} is now OFF")
+        getattr(self, f"toggle_{fader}").configure(style="phmpOff.TButton")
+    elif 64 <= getCHpPower(ch) <= 456:
+        print(f"Preamp for {fader} is now ON")
+        getattr(self, f"toggle_{fader}").configure(style="phmpOn.TButton")     
+    else:
+        print(f"Preamp for {fader} is in an unknown state")
+        getattr(self, f"toggle_{fader}").configure(style="phmpTest.TButton")
     

@@ -149,8 +149,8 @@ def getCHpPower(fader):
             return data[6]
         except Exception as e:
             print(f'Error: {e}')
-            return False
-    return False
+            return -1
+    return -1
 
 def toggleCHpPower(fader): 
     pPowerOff = bytes([0xB0, 0x63, fader, 0xB0, 0x62, 0x1B, 0xB0, 0x06, 0x00])
@@ -165,4 +165,3 @@ def toggleCHpPower(fader):
         except Exception as e:
             print(f'Error: {e}')
             
-
