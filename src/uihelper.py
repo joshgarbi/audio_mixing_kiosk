@@ -9,8 +9,9 @@ from ttkbootstrap.constants import LEFT, RIGHT
 from fader import FaderManager
 from ahm_control import test_connection, restart_connection, toggleCHpPower, getCHpPower
 from password_manager import verify_pass
+import yaml
 
-
+pi_ip_path = "~/etc/netplan/eth0.yaml"
 
 def drawfaderbank(self, master_c):
     """Draw the fader bank widget."""
@@ -52,6 +53,8 @@ def ip_settings(self, master_c):
         validate="focusout",
         validatecommand=vip_cmd,
     )
+    
+    
 
     ip_settings_var.delete(0, tk.END)
     ip_settings_var.insert(0, getdata("ip_address"))
@@ -83,6 +86,33 @@ def ip_settings(self, master_c):
     else:
         self.connectionStatus.configure(style="Red.TLabel")
         
+    """Display IP and Subnet Mask settings for the Raspberry Pi"""
+    pi_ip_frame = ttk.Frame(master_c)
+    pi_ip_frame.place(relx=0.5, rely=0.3, anchor="n", width=frame_width, height=84)
+    
+    pi_ip_settings_var = ttk.Entry(
+        pi_ip_frame,
+        validate="focusout",
+        validatecommand=vip_cmd,
+    )
+    pi_ip_settings_var.delete(0, tk.END)
+    pi_ip_settings_var.insert(0, getdata("pi_ip_address"))
+    pi_ip_settings_var.configure(font=("Arial", 18))
+    pi_ip_settings_var.place(x=5, y=5, width=220, height=40)
+    
+    pi_subnet_settings_var = ttk.Entry(
+        pi_ip_frame,
+        validate="focusout",
+        validatecommand=vip_cmd,
+    )
+    pi_subnet_settings_var.delete(0, tk.END)
+    pi_subnet_settings_var.insert(0, getdata("pi_subnet_mask"))
+    pi_subnet_settings_var.configure(font=("Arial", 18))
+    pi_subnet_settings_var.place(x=230, y=5, width=100, height=40)
+    
+    
+    
+    
 def preamp_settings(self, masterC):
     
     with open('src/cfg.json', 'r') as jsonfile:
@@ -159,22 +189,50 @@ def validate_ip(self, ip_str, debug=False):
 
 
 
-def savedata(label, value):
-    """Save configuration value to JSON file."""
-    with open("src/cfg.json", "r", encoding="utf-8") as jsonfile:
-        data = json.load(jsonfile)
+def savedata(label, value, os_path=pi_ip_path):
+    if label[0:3] == "pi_":
+        try:
+            with open(os_path, "r") as yamlfile:
+                data = yaml.safe_load(yamlfile)
+                if label == "pi_ip_address":
+                    data["network"]["ethernets"]["eth0"]["addresses"][0] = f"{value}/24"
+                elif label == "pi_subnet_mask":
+                    prefix_length = sum(bin(int(x)).count("1") for x in value.split("."))
+                    data["network"]["ethernets"]["eth0"]["addresses"][0] = f"{getdata('pi_ip_address')}/{prefix_length}"
+            with open(os_path, "w") as yamlfile:
+                yaml.safe_dump(data, yamlfile)
+        except (FileNotFoundError, yaml.YAMLError) as e:
+            print(f"Error writing to {os_path}: {e}")
+    else:
+        """Save configuration value to JSON file."""
+        with open("src/cfg.json", "r", encoding="utf-8") as jsonfile:
+            data = json.load(jsonfile)
 
-    data["TCP"][label] = value
+        data["TCP"][label] = value
 
-    with open("src/cfg.json", "w", encoding="utf-8") as jsonfile:
-        json.dump(data, jsonfile, indent=4)      
+        with open("src/cfg.json", "w", encoding="utf-8") as jsonfile:
+            json.dump(data, jsonfile, indent=4)      
 
-def getdata(label):
-    """Retrieve configuration value from JSON file."""
-    with open("src/cfg.json", "r", encoding="utf-8") as jsonfile:
-        data = json.load(jsonfile)
+def getdata(label, os_path=pi_ip_path):
+    if label[0:3] == "pi_":
+        try:
+            with open(os_path, "r") as yamlfile:
+                data = yaml.safe_load(yamlfile)
+                if label == "pi_ip_address":
+                    return data["network"]["ethernets"]["eth0"]["addresses"][0].split("/")[0]
+                elif label == "pi_subnet_mask":
+                    prefix_length = int(data["network"]["ethernets"]["eth0"]["addresses"][0].split("/")[1])
+                    subnet_mask = ".".join([str((0xffffffff << (32 - prefix_length) >> i) & 0xff) for i in [24, 16, 8, 0]])
+                    return subnet_mask
+        except (FileNotFoundError, yaml.YAMLError, KeyError):
+            print(f"Error reading {os_path}. Ensure the file exists and is properly formatted.")
+            return "Unavailable"
+    else:
+        """Retrieve configuration value from JSON file."""
+        with open("src/cfg.json", "r", encoding="utf-8") as jsonfile:
+            data = json.load(jsonfile)
 
-    return data["TCP"][label]
+        return data["TCP"][label]
 
 def prompt_password(self, master_c):
     """Display password prompt overlay."""
