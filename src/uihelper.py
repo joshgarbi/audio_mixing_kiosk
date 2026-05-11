@@ -299,11 +299,13 @@ def toggle_preamp(self, fader, ch):
     
     
     if 0 <= getCHpPower(ch) <= 63:
-        print(f"Preamp for {fader} is now OFF")
-        getattr(self, f"toggle_{fader}").configure(style="phmpOff.TButton")
-    elif 64 <= getCHpPower(ch) <= 456:
+        toggleCHpPower(int(ch))
         print(f"Preamp for {fader} is now ON")
         getattr(self, f"toggle_{fader}").configure(style="phmpOn.TButton")     
+    elif 64 <= getCHpPower(ch) <= 456:
+        toggleCHpPower(int(ch))
+        print(f"Preamp for {fader} is now OFF")
+        getattr(self, f"toggle_{fader}").configure(style="phmpOff.TButton")
     else:
         print(f"Preamp for {fader} is in an unknown state")
         getattr(self, f"toggle_{fader}").configure(style="phmpTest.TButton")

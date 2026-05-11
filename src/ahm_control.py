@@ -151,6 +151,7 @@ def getCHpPower(fader):
         try:
             _SOCKET.sendall(GETPPOWER)
             data = _SOCKET.recv(16)
+            print(f"Phantom power status for fader {fader}: {data[6]}")
             return data[6]
         except Exception as e:
             print(f'Error: {e}')
