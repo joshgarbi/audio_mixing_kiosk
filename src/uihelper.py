@@ -11,7 +11,7 @@ from ahm_control import test_connection, restart_connection, toggleCHpPower, get
 from password_manager import verify_pass
 import yaml
 
-pi_ip_path = "~/etc/netplan/eth0.yaml"
+pi_ip_path = "~/etc/netplan/50-cloud-init.yaml"
 
 def drawfaderbank(self, master_c):
     """Draw the fader bank widget."""
