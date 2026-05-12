@@ -62,17 +62,17 @@ def ip_settings(self, master_c):
     ip_settings_var.configure(font=("Arial", 18))
     ip_settings_var.place(x=5, y=5, width=220, height=40)
 
-    port_settings_var = ttk.Entry(
-        ip_frame,
-        validate="focusout",
-        validatecommand=vport_cmd,
-    )
+    # port_settings_var = ttk.Entry(
+    #     ip_frame,
+    #     validate="focusout",
+    #     validatecommand=vport_cmd,
+    # )
 
-    port_settings_var.delete(0, tk.END)
-    port_settings_var.insert(0, getdata("port"))
+    # port_settings_var.delete(0, tk.END)
+    # port_settings_var.insert(0, getdata("port"))
 
-    port_settings_var.configure(font=("Arial", 18))
-    port_settings_var.place(x=230, y=5, width=100, height=40)
+    # port_settings_var.configure(font=("Arial", 18))
+    # port_settings_var.place(x=230, y=5, width=100, height=40)
 
     self.connectionStatus = ttk.Label(
         ip_frame,
