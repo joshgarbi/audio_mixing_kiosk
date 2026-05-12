@@ -108,7 +108,7 @@ def ip_settings(self, master_c):
     pi_subnet_settings_var.delete(0, tk.END)
     pi_subnet_settings_var.insert(0, getdata("pi_subnet_mask"))
     pi_subnet_settings_var.configure(font=("Arial", 18))
-    pi_subnet_settings_var.place(x=230, y=5, width=100, height=40)
+    pi_subnet_settings_var.place(x=230, y=5, width=220, height=40)
     
     
     
