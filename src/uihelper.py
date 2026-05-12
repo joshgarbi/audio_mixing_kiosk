@@ -11,7 +11,7 @@ from ahm_control import test_connection, restart_connection, toggleCHpPower, get
 from password_manager import verify_pass
 import yaml
 
-pi_ip_path = "~/etc/netplan/50-cloud-init.yaml"
+pi_ip_path = "etc/netplan/50-cloud-init.yaml"
 
 def drawfaderbank(self, master_c):
     """Draw the fader bank widget."""
@@ -225,7 +225,7 @@ def getdata(label, os_path=pi_ip_path):
                     subnet_mask = ".".join([str((0xffffffff << (32 - prefix_length) >> i) & 0xff) for i in [24, 16, 8, 0]])
                     return subnet_mask
         except Exception as e:
-            return e
+            return e[8:] 
     else:
         """Retrieve configuration value from JSON file."""
         with open("src/cfg.json", "r", encoding="utf-8") as jsonfile:
