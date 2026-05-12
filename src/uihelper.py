@@ -11,6 +11,7 @@ from ahm_control import test_connection, restart_connection, toggleCHpPower, get
 from password_manager import verify_pass
 import yaml
 import os
+import sys
 
 pi_ip_path = "/etc/netplan/50-cloud-init.yaml"
 
@@ -96,8 +97,16 @@ def ip_settings(self, master_c):
         validate="focusout",
         validatecommand=vip_cmd,
     )
+    # Safely get Pi IP, with fallback
+    try:
+        pi_ip_val = getdata("pi_ip_address", silent=True)
+        if not pi_ip_val or pi_ip_val == "N/A":
+            pi_ip_val = "192.168.1.1"
+    except Exception:
+        pi_ip_val = "192.168.1.1"
+    
     pi_ip_settings_var.delete(0, tk.END)
-    pi_ip_settings_var.insert(0, getdata("pi_ip_address"))
+    pi_ip_settings_var.insert(0, pi_ip_val)
     pi_ip_settings_var.configure(font=("Arial", 18))
     pi_ip_settings_var.place(x=5, y=5, width=220, height=40)
     
@@ -106,8 +115,16 @@ def ip_settings(self, master_c):
         validate="focusout",
         validatecommand=vip_cmd,
     )
+    # Safely get Pi subnet, with fallback
+    try:
+        pi_subnet_val = getdata("pi_subnet_mask", silent=True)
+        if not pi_subnet_val or pi_subnet_val == "N/A":
+            pi_subnet_val = "255.255.255.0"
+    except Exception:
+        pi_subnet_val = "255.255.255.0"
+    
     pi_subnet_settings_var.delete(0, tk.END)
-    pi_subnet_settings_var.insert(0, getdata("pi_subnet_mask"))
+    pi_subnet_settings_var.insert(0, pi_subnet_val)
     pi_subnet_settings_var.configure(font=("Arial", 18))
     pi_subnet_settings_var.place(x=230, y=5, width=100, height=40)
     
@@ -215,10 +232,16 @@ def savedata(label, value, os_path=pi_ip_path):
         with open("src/cfg.json", "w", encoding="utf-8") as jsonfile:
             json.dump(data, jsonfile, indent=4)      
 
-def getdata(label, os_path=pi_ip_path):
+def getdata(label, os_path=pi_ip_path, silent=False):
     if label[0:3] == "pi_":
+        # Only try to read netplan config on Linux
+        if sys.platform != "linux":
+            return "N/A"
+        
         try:
             real_path = os.path.expanduser(os_path)
+            if not os.path.exists(real_path):
+                return "N/A"
             with open(real_path, "r") as yamlfile:
                 data = yaml.safe_load(yamlfile)
                 if label == "pi_ip_address":
@@ -227,9 +250,10 @@ def getdata(label, os_path=pi_ip_path):
                     prefix_length = int(data["network"]["ethernets"]["eth0"]["addresses"][0].split("/")[1])
                     subnet_mask = ".".join([str((0xffffffff << (32 - prefix_length) >> i) & 0xff) for i in [24, 16, 8, 0]])
                     return subnet_mask
-        except (FileNotFoundError, yaml.YAMLError, KeyError):
-            print(f"Error reading {real_path}. Ensure the file exists and is properly formatted.")
-            return "Unavailable"
+        except (FileNotFoundError, yaml.YAMLError, KeyError, PermissionError) as e:
+            if not silent:
+                print(f"Error reading {real_path}: {e}")
+            return "N/A"
     else:
         """Retrieve configuration value from JSON file."""
         with open("src/cfg.json", "r", encoding="utf-8") as jsonfile:
