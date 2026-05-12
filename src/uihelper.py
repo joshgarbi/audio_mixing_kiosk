@@ -10,8 +10,9 @@ from fader import FaderManager
 from ahm_control import test_connection, restart_connection, toggleCHpPower, getCHpPower
 from password_manager import verify_pass
 import yaml
+import os
 
-pi_ip_path = "~/etc/netplan/50-cloud-init.yaml"
+pi_ip_path = "/etc/netplan/50-cloud-init.yaml"
 
 def drawfaderbank(self, master_c):
     """Draw the fader bank widget."""
@@ -192,17 +193,18 @@ def validate_ip(self, ip_str, debug=False):
 def savedata(label, value, os_path=pi_ip_path):
     if label[0:3] == "pi_":
         try:
-            with open(os_path, "r") as yamlfile:
+            real_path = os.path.expanduser(os_path)
+            with open(real_path, "r") as yamlfile:
                 data = yaml.safe_load(yamlfile)
                 if label == "pi_ip_address":
                     data["network"]["ethernets"]["eth0"]["addresses"][0] = f"{value}/24"
                 elif label == "pi_subnet_mask":
                     prefix_length = sum(bin(int(x)).count("1") for x in value.split("."))
                     data["network"]["ethernets"]["eth0"]["addresses"][0] = f"{getdata('pi_ip_address')}/{prefix_length}"
-            with open(os_path, "w") as yamlfile:
+            with open(real_path, "w") as yamlfile:
                 yaml.safe_dump(data, yamlfile)
-        except (FileNotFoundError, yaml.YAMLError) as e:
-            print(f"Error writing to {os_path}: {e}")
+        except (FileNotFoundError, yaml.YAMLError, PermissionError) as e:
+            print(f"Error writing to {real_path}: {e}")
     else:
         """Save configuration value to JSON file."""
         with open("src/cfg.json", "r", encoding="utf-8") as jsonfile:
@@ -216,7 +218,8 @@ def savedata(label, value, os_path=pi_ip_path):
 def getdata(label, os_path=pi_ip_path):
     if label[0:3] == "pi_":
         try:
-            with open(os_path, "r") as yamlfile:
+            real_path = os.path.expanduser(os_path)
+            with open(real_path, "r") as yamlfile:
                 data = yaml.safe_load(yamlfile)
                 if label == "pi_ip_address":
                     return data["network"]["ethernets"]["eth0"]["addresses"][0].split("/")[0]
@@ -225,7 +228,7 @@ def getdata(label, os_path=pi_ip_path):
                     subnet_mask = ".".join([str((0xffffffff << (32 - prefix_length) >> i) & 0xff) for i in [24, 16, 8, 0]])
                     return subnet_mask
         except (FileNotFoundError, yaml.YAMLError, KeyError):
-            print(f"Error reading {os_path}. Ensure the file exists and is properly formatted.")
+            print(f"Error reading {real_path}. Ensure the file exists and is properly formatted.")
             return "Unavailable"
     else:
         """Retrieve configuration value from JSON file."""
