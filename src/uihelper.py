@@ -93,7 +93,7 @@ def ip_settings(self, master_c):
     pi_ip_settings_var = ttk.Entry(
         pi_ip_frame,
         validate="focusout",
-        validatecommand=vip_cmd,
+        # validatecommand=vip_cmd, do not implement without AHM controller authentication
     )
     pi_ip_settings_var.delete(0, tk.END)
     pi_ip_settings_var.insert(0, getdata("pi_ip_address"))
@@ -103,7 +103,7 @@ def ip_settings(self, master_c):
     pi_subnet_settings_var = ttk.Entry(
         pi_ip_frame,
         validate="focusout",
-        validatecommand=vip_cmd,
+        # validatecommand=vip_cmd, do not implement without AHM controller authentication
     )
     pi_subnet_settings_var.delete(0, tk.END)
     pi_subnet_settings_var.insert(0, getdata("pi_subnet_mask"))
