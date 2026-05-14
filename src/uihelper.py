@@ -46,7 +46,7 @@ def ip_settings(self, master_c):
     ip_frame.place(relx=0.5, rely=0.2, anchor="n", width=frame_width, height=84)
 
     vip_cmd = (ip_frame.register(lambda p: validate_ip(self, p)), "%P")
-    vport_cmd = (ip_frame.register(lambda p: validate_port(self, p)), "%P")
+    # vport_cmd = (ip_frame.register(lambda p: validate_port(self, p)), "%P")
 
     ip_settings_var = ttk.Entry(
         ip_frame,
@@ -96,7 +96,7 @@ def ip_settings(self, master_c):
         validatecommand=vip_cmd,
     )
     pi_ip_settings_var.delete(0, tk.END)
-    pi_ip_settings_var.insert(0, getdata("pi_ip_address"))
+    pi_ip_settings_var.insert(0, getdata("pi_address"))
     pi_ip_settings_var.configure(font=("Arial", 18))
     pi_ip_settings_var.place(x=5, y=5, width=220, height=40)
     
