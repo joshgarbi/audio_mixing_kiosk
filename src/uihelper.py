@@ -214,7 +214,7 @@ def savedata(label, value, os_path=pi_ip_path):
             json.dump(data, jsonfile, indent=4)      
 
 def getdata(label, os_path=pi_ip_path):
-    if label[0:2] == "pi_":
+    if label[0:3] == "pi_":
         try:
             with open(os_path, "r") as yamlfile:
                 data = yaml.safe_load(yamlfile)
