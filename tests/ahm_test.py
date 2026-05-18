@@ -1,7 +1,7 @@
 """Tests for AHM TCP connection and control functions."""
 import json
 import os
-from ahm_control import initialize_connection, close_connection, getCHlevel, test_connection, toggleCHpPower, getCHpPower
+from ahm_control import initialize_connection, close_connection, get_ch_level, test_connection, toggleCHpPower, getCHpPower
 import socket
 import pytest
     
@@ -38,7 +38,9 @@ def test_l_ahm_connection(pytestconfig):
     os.environ.get("CI") == "true",
     reason="Skipping AHM control test in CI environment",
 ) 
-def test_phantom_power():
+def test_phantom_power(pytestconfig):
+    if pytestconfig.getoption("no_AHM"):
+        pytest.skip("AHM control test skipped by command line option")
     init_status = getCHpPower()
     toggleCHpPower()
     new_status = getCHpPower()

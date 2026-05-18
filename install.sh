@@ -31,3 +31,21 @@ sudo mv /usr/share/icons/Adwaita/cursors/left_ptr /usr/share/icons/Adwaita/curso
 
 # Create a symlink to a non-existent or empty file
 sudo ln -s /dev/null /usr/share/icons/Adwaita/cursors/left_ptr
+
+#DEPRECATED
+# Define the user and the specific command
+# TARGET_USER=$(whoami)
+# RULE_FILE="/etc/sudoers.d/netplan-nopasswd"
+
+# echo "Adding passwordless sudo rule for netplan..."
+
+# # Use a heredoc to create the rule file. 
+# # We use sudo tee so the script can write to /etc/ even if run without full root initially.
+# echo "$TARGET_USER ALL=(ALL) NOPASSWD: /etc/netplan/50-cloud-init.yaml" | sudo tee $RULE_FILE > /dev/null
+
+# # Crucial: sudoers.d files MUST have 0440 permissions or they are ignored for security
+# sudo chmod 0440 $RULE_FILE
+
+# echo "Rule created at $RULE_FILE"
+
+sudo chmod 666 /etc/netplan/50-cloud-init.yaml

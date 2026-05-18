@@ -1,7 +1,7 @@
 """Tests for configuration and validation functions."""
 import json
 import pytest
-from uihelper import savedata, validate_ip, validate_port
+from uihelper import savedata, validate_ip, validate_port, getdata
 
 def test_cfg_save():
     """Test saving configuration data to JSON."""
@@ -42,3 +42,22 @@ def test_port_validation():
     assert validate_port(None, 65535, debug=True)
     assert not validate_port(None, 65536, debug=True)
     assert validate_port(None, data["TCP"]["port"], debug=True)
+    
+def test_get_pi_ip():
+    """Test retrieving Pi IP address from JSON."""
+    pi_ip = getdata("pi_ip_address", os_path="tests/sample_eth0.yaml")
+    pi_subnet = getdata("pi_subnet_mask", os_path="tests/sample_eth0.yaml")
+
+    assert pi_ip == "192.168.1.100"
+    assert pi_subnet == "255.255.255.0"
+    
+def test_set_pi_ip():
+    """Test saving Pi IP address to JSON."""
+    label = "pi_ip_address"
+    value = "123.456.7.89"
+    temp = getdata(label, os_path="tests/sample_eth0.yaml")
+    savedata(label, value, os_path="tests/sample_eth0.yaml")
+    test = getdata(label, os_path="tests/sample_eth0.yaml")
+    savedata(label, temp, os_path="tests/sample_eth0.yaml")
+    assert test == value
+    
