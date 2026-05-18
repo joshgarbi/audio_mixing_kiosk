@@ -43,10 +43,10 @@ class FaderManager:
             )
             self.faders.append(self.fader)
 
-    def update_all(self):
-        """Update all fader level displays."""
-        for self.fader in self.faders:
-            self.fader.update_fader_level()
+    # def update_all(self):
+    #     """Update all fader level displays."""
+    #     for self.fader in self.faders:
+    #         self.fader.update_fader_level()
 
 
 class Fader:
@@ -103,10 +103,10 @@ class Fader:
         self.fader1slider.set(get_ch_level(self.channel))
         self.fader1slider.pack(pady=4)
 
-        self.level1 = GradientAudioMeter(
-            self.fader1group, width=meter_width, height=slider_length
-        )
-        self.level1.pack(side="right", padx=4, pady=24)
+        # self.level1 = GradientAudioMeter(
+        #     self.fader1group, width=meter_width, height=slider_length
+        # )
+        # self.level1.pack(side="right", padx=4, pady=24)
 
     def change_fader_value(self, value):
         """Handle fader value change event."""
@@ -114,12 +114,12 @@ class Fader:
         set_ch_level(value, self.channel)
         self.fader_level = value
 
-    def update_fader_level(self):
-        """Update meter display with current level."""
-        level = self.fader1slider.get()
-        noise = random.randint(-5, 5)
-        level += noise
-        self.level1.set_level(level)
-        self.master.after(self.update_interval, self.update_fader_level)
+    # def update_fader_level(self):
+    #     """Update meter display with current level."""
+    #     level = self.fader1slider.get()
+    #     noise = random.randint(-5, 5)
+    #     level += noise
+    #     # self.level1.set_level(level)
+    #     self.master.after(self.update_interval, self.update_fader_level)
         
     

@@ -124,9 +124,48 @@ class SimpleApp:
             command=self.settings_window.destroy,
         )
         escape_button.pack(side="bottom", padx=30, pady=16)
+        
+        """Menu to switch between Network and Audio Settings"""
+        menu_frame = ttk.Frame(self.settings_window)
+        menu_frame.pack(pady=10)
+        network_button = ttk.Button(
+            menu_frame,
+            width=16,
+            text="Network Settings",
+            bootstyle="tertiary",
+            style="Dialog.TButton",
+            command=lambda: self.show_settings_panel("network"),
+        )
+        network_button.pack(side="left", padx=10)
+        audio_button = ttk.Button(
+            menu_frame,
+            width=16,
+            text="Audio Settings",
+            bootstyle="tertiary",
+            style="Dialog.TButton",
+            command=lambda: self.show_settings_panel("audio"),
 
-        ip_settings(self, self.settings_window)
-        preamp_settings(self, self.settings_window)
+        )
+        audio_button.pack(side="left", padx=10)
+        
+    def show_settings_panel(self, panel_type):
+        """Display the selected settings panel.
+
+        Destroy any previously-created settings panel before showing the new one.
+        """
+        # destroy previous panels if present
+        for attr in ("network_panel", "preamp_panel"):
+            if hasattr(self, attr) and getattr(self, attr) is not None:
+                try:
+                    getattr(self, attr).destroy()
+                except Exception:
+                    pass
+                setattr(self, attr, None)
+
+        if panel_type == "network":
+            ip_settings(self, self.settings_window)
+        elif panel_type == "audio":
+            preamp_settings(self, self.settings_window)
 
     def shutdown(self):
         """Close AHM connection and shut down application."""

@@ -30,7 +30,7 @@ def drawfaderbank(self, master_c):
 
     self.faders = FaderManager(self.faderBank)
     self.faders.create_faders()
-    self.faders.update_all()
+    # self.faders.update_all()
 
 
 def ip_settings(self, master_c):
@@ -41,9 +41,13 @@ def ip_settings(self, master_c):
     style.configure("Red.TLabel", foreground="red")
     style.configure("Green.TLabel", foreground="green")
 
-    ip_frame = ttk.Frame(master_c)
+    # create a parent panel so we can destroy/place-forget the whole settings group
     frame_width = min(500, self.width - 40)
-    ip_frame.place(relx=0.5, rely=0.2, anchor="n", width=frame_width, height=84)
+    network_panel = ttk.Frame(master_c)
+    network_panel.place(relx=0.5, rely=0.2, anchor="n", width=frame_width, height=172)
+
+    ip_frame = ttk.Frame(network_panel)
+    ip_frame.place(x=0, y=0, width=frame_width, height=84)
 
     vip_cmd = (ip_frame.register(lambda p: validate_ip(self, p)), "%P")
     # vport_cmd = (ip_frame.register(lambda p: validate_port(self, p)), "%P")
@@ -87,8 +91,8 @@ def ip_settings(self, master_c):
         self.connectionStatus.configure(style="Red.TLabel")
         
     """Display IP and Subnet Mask settings for the Raspberry Pi"""
-    pi_ip_frame = ttk.Frame(master_c)
-    pi_ip_frame.place(relx=0.5, rely=0.3, anchor="n", width=frame_width, height=84)
+    pi_ip_frame = ttk.Frame(network_panel)
+    pi_ip_frame.place(x=0, y=84, width=frame_width, height=84)
     
     pi_ip_settings_var = ttk.Entry(
         pi_ip_frame,
@@ -109,6 +113,10 @@ def ip_settings(self, master_c):
     pi_subnet_settings_var.insert(0, getdata("pi_subnet_mask"))
     pi_subnet_settings_var.configure(font=("Arial", 18))
     pi_subnet_settings_var.place(x=230, y=5, width=220, height=40)
+    # attach the panel to `self` so callers can destroy it later
+    self.network_panel = network_panel
+    return network_panel
+    
     
     
     
@@ -140,9 +148,9 @@ def preamp_settings(self, masterC):
         getattr(self, f"toggle_{fader}").configure(style="phmpOff.TButton")
         x_pos = start_x + index * (button_size + button_gap)
         getattr(self, f"toggle_{fader}").place(x=x_pos, y=10, width=button_size, height=button_size)
-        
-    
-        
+    # attach the panel to `self` so callers can destroy it later
+    self.preamp_panel = preamp_frame
+    return preamp_frame
     
         
 def handle_reconnection(self):
