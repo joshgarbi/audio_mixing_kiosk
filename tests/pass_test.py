@@ -1,4 +1,3 @@
-"""Tests for password hashing and verification."""
 import os
 import keyring
 from password_manager import new_pass, verify_pass

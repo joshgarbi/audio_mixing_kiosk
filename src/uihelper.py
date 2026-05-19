@@ -7,11 +7,11 @@ import tkinter as tk
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import LEFT, RIGHT
 from fader import FaderManager
-from ahm_control import test_connection, restart_connection, toggleCHpPower, getCHpPower
+from ahm_control import test_connection, restart_connection, toggle_ch_pPower, get_ch_pPower
 from password_manager import verify_pass
 import yaml
 
-pi_ip_path = "/etc/netplan/50-cloud-init.yaml"
+PI_IP_PATH = "/etc/netplan/50-cloud-init.yaml"
 
 def drawfaderbank(self, master_c):
     """Draw the fader bank widget."""
@@ -57,8 +57,8 @@ def ip_settings(self, master_c):
         validate="focusout",
         validatecommand=vip_cmd,
     )
-    
-    
+
+
 
     ip_settings_var.delete(0, tk.END)
     ip_settings_var.insert(0, getdata("ip_address"))
@@ -89,11 +89,10 @@ def ip_settings(self, master_c):
         self.connectionStatus.configure(style="Green.TLabel")
     else:
         self.connectionStatus.configure(style="Red.TLabel")
-        
-    """Display IP and Subnet Mask settings for the Raspberry Pi"""
+
     pi_ip_frame = ttk.Frame(network_panel)
     pi_ip_frame.place(x=0, y=84, width=frame_width, height=84)
-    
+
     pi_ip_settings_var = ttk.Entry(
         pi_ip_frame,
         validate="focusout",
@@ -103,7 +102,7 @@ def ip_settings(self, master_c):
     pi_ip_settings_var.insert(0, getdata("pi_ip_address"))
     pi_ip_settings_var.configure(font=("Arial", 18))
     pi_ip_settings_var.place(x=5, y=5, width=220, height=40)
-    
+
     pi_subnet_settings_var = ttk.Entry(
         pi_ip_frame,
         validate="focusout",
@@ -116,18 +115,18 @@ def ip_settings(self, master_c):
     # attach the panel to `self` so callers can destroy it later
     self.network_panel = network_panel
     return network_panel
-    
-    
-    
-    
-    
+
+
+
+
+
 def preamp_settings(self, masterC):
-    
+
     with open('src/cfg.json', 'r') as jsonfile:
         data = json.load(jsonfile)
-        
+
     faders = data["BANK"]
-        
+
     preamp_frame = ttk.Frame(masterC)
     frame_width = self.width - 40
     preamp_frame.place(relx=0.5, rely=0.4, anchor="n", width=frame_width, height=74)
@@ -151,8 +150,8 @@ def preamp_settings(self, masterC):
     # attach the panel to `self` so callers can destroy it later
     self.preamp_panel = preamp_frame
     return preamp_frame
-    
-        
+
+
 def handle_reconnection(self):
     """Reconnect to AHM device and update connection status."""
     self.connectionStatus.configure(style="Red.TLabel")
@@ -186,7 +185,7 @@ def validate_ip(self, ip_str, debug=False):
             raise ValueError("IP address must have 4 parts.")
         for part in parts:
             num = int(part)
-            if not (0 <= num <= 255):
+            if not 0 <= num <= 255:
                 raise ValueError("Each part of IP must be between 0 and 255.")
         savedata("ip_address", ip_str)
         if not debug:
@@ -197,7 +196,7 @@ def validate_ip(self, ip_str, debug=False):
 
 
 
-def savedata(label, value, os_path=pi_ip_path):
+def savedata(label, value, os_path=PI_IP_PATH):
     if label[0:3] == "pi_":
         try:
             with open(os_path, "r") as yamlfile:
@@ -212,16 +211,15 @@ def savedata(label, value, os_path=pi_ip_path):
         except (FileNotFoundError, yaml.YAMLError) as e:
             print(f"Error writing to {os_path}: {e}")
     else:
-        """Save configuration value to JSON file."""
         with open("src/cfg.json", "r", encoding="utf-8") as jsonfile:
             data = json.load(jsonfile)
 
         data["TCP"][label] = value
 
         with open("src/cfg.json", "w", encoding="utf-8") as jsonfile:
-            json.dump(data, jsonfile, indent=4)      
+            json.dump(data, jsonfile, indent=4)
 
-def getdata(label, os_path=pi_ip_path):
+def getdata(label, os_path=PI_IP_PATH):
     if label[0:3] == "pi_":
         try:
             with open(os_path, "r") as yamlfile:
@@ -299,21 +297,20 @@ def check_password(self):
     else:
         self.password_entry.delete(0, tk.END)
         self.password_entry.configure(style="Red.TEntry")
-        
-    
+
+
 def toggle_preamp(self, fader, ch):
-    toggleCHpPower(int(ch))
-    
-    
-    if 0 <= getCHpPower(ch) <= 63:
-        toggleCHpPower(int(ch))
+    toggle_ch_pPower(int(ch))
+
+
+    if 0 <= get_ch_pPower(ch) <= 63:
+        toggle_ch_pPower(int(ch))
         print(f"Preamp for {fader} is now ON")
-        getattr(self, f"toggle_{fader}").configure(style="phmpOn.TButton")     
-    elif 64 <= getCHpPower(ch) <= 456:
-        toggleCHpPower(int(ch))
+        getattr(self, f"toggle_{fader}").configure(style="phmpOn.TButton")
+    elif 64 <= get_ch_pPower(ch) <= 456:
+        toggle_ch_pPower(int(ch))
         print(f"Preamp for {fader} is now OFF")
         getattr(self, f"toggle_{fader}").configure(style="phmpOff.TButton")
     else:
         print(f"Preamp for {fader} is in an unknown state")
         getattr(self, f"toggle_{fader}").configure(style="phmpTest.TButton")
-    

@@ -1,6 +1,3 @@
-"""Sample baseline tests."""
-import pytest
-
 def test_sample_function():
     """Test basic addition."""
     assert 1 + 1 == 2

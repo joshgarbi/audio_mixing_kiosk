@@ -28,6 +28,6 @@ def verify_pass(user_id, password):
 
 
 if __name__ == "__main__":
-    password = getpass.getpass("Enter new password for admin: ")
-    new_pass("admin", password)
+    sys_password = getpass.getpass("Enter new password for admin: ")
+    new_pass("admin", sys_password)
     print("Password set successfully.")

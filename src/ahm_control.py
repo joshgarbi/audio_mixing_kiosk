@@ -34,19 +34,19 @@ def initialize_connection():
         time.sleep(0.1)
         print("AHM connection established!")
         print(AHM_IP, AHM_PORT)
-    except Exception as e:
+    except TimeoutError as e:
         print(AHM_IP, AHM_PORT)
         print(f"Failed to connect to AHM: {e}")
         _SOCKET = None
-        
+
 def close_connection():
     """Close TCP connection to AHM device."""
     if _SOCKET:
         try:
             _SOCKET.close()
             print("AHM connection closed.")
-        except Exception:
-            return
+        except TimeoutError:
+            pass
 
 def test_connection():
     """Test AHM connection by sending a SYSEX query."""
@@ -54,9 +54,9 @@ def test_connection():
     if _SOCKET:
         try:
             _SOCKET.sendall(get_chname)
-            data = _SOCKET.recv(4)
-            return data
-        except Exception:
+            temp = _SOCKET.recv(4)
+            return temp
+        except TimeoutError:
             pass
     return None
 
@@ -74,10 +74,10 @@ def update_settings():
     global AHM_IP
     global AHM_PORT
     with open('src/cfg.json', 'r', encoding='utf-8') as f:
-        data = json.load(f)
+        temp = json.load(f)
 
-    AHM_IP = data['TCP']['ip_address']
-    AHM_PORT = data['TCP']['port']
+    AHM_IP = temp['TCP']['ip_address']
+    AHM_PORT = temp['TCP']['port']
 
 def mute():
     """Send mute command to all channels."""
@@ -85,7 +85,7 @@ def mute():
         try:
             _SOCKET.sendall(MUTE_NOTE)
             time.sleep(0.1)
-        except Exception as e:
+        except TimeoutError as e:
             print(f"Error: {e}")
 
 def unmute():
@@ -94,7 +94,7 @@ def unmute():
         try:
             _SOCKET.sendall(UNMUTE_NOTE)
             time.sleep(0.1)
-        except Exception as e:
+        except TimeoutError as e:
             print(f"Error: {e}")
 
 def set_ch_level(value, fader=0x00):
@@ -105,7 +105,7 @@ def set_ch_level(value, fader=0x00):
             scaled_value = int(value * 127 / 100)
             level_byte = bytes([scaled_value])
             _SOCKET.sendall(set_level + level_byte)
-        except Exception as e:
+        except TimeoutError as e:
             print(f'Error: {e}')
 
 def get_ch_level(fader):
@@ -116,58 +116,57 @@ def get_ch_level(fader):
             _SOCKET.sendall(get_level)
             data = _SOCKET.recv(16)
             return data[6] * 100 / 127
-        except Exception as e:
+        except TimeoutError as e:
             print(f'Error: {e}')
             return -1
     return -1
 
-def setCHgain(value, fader):
-    SETLEVEL = bytes([0xB0, 0x63, fader, 0xB0, 0x62, 0x19, 0xB0, 0x06]) 
+def set_ch_gain(value, fader):
+    SETLEVEL = bytes([0xB0, 0x63, fader, 0xB0, 0x62, 0x19, 0xB0, 0x06])
     if _SOCKET:
         try:
             scaled_value = int(value * 127 / 100) # Ensure 100 maps to 127, not 126
             level_byte = bytes([scaled_value])
             _SOCKET.sendall(SETLEVEL + level_byte)
             # time.sleep(0.1)
-        except Exception as e:
+        except TimeoutError as e:
             print(f'Error: {e}')
 
-def getCHgain(fader):
+def get_ch_gain(fader):
     GETLEVEL = SYSEX_HEADER + bytes([0x00, 0x01, 0x0B, 0x19, fader, 0xF7])
     if _SOCKET:
         try:
             _SOCKET.sendall(GETLEVEL)
-            data = _SOCKET.recv(16)
-            return data[6] * 100 / 127
-        except Exception as e:
+            temp = _SOCKET.recv(16)
+            return temp[6] * 100 / 127
+        except TimeoutError as e:
             print(f'Error: {e}')
             return -1
     return -1
 
 
-def getCHpPower(fader):
+def get_ch_pPower(fader):
     GETPPOWER = SYSEX_HEADER + bytes([0x00, 0x01, 0x0B, 0x1B, fader, 0xF7])
     if _SOCKET:
         try:
             _SOCKET.sendall(GETPPOWER)
-            data = _SOCKET.recv(16)
-            print(f"Phantom power status for fader {fader}: {data[6]}")
-            return data[6]
-        except Exception as e:
+            temp = _SOCKET.recv(16)
+            print(f"Phantom power status for fader {fader}: {temp[6]}")
+            return temp[6]
+        except TimeoutError as e:
             print(f'Error: {e}')
             return -1
     return -1
 
-def toggleCHpPower(fader): 
+def toggle_ch_pPower(fader):
     pPowerOff = bytes([0xB0, 0x63, fader, 0xB0, 0x62, 0x1B, 0xB0, 0x06, 0x00])
     pPowerOn = bytes([0xB0, 0x63, fader, 0xB0, 0x62, 0x1B, 0xB0, 0x06, 0x7F])
-    state = getCHpPower(fader)
+    state = get_ch_pPower(fader)
     if _SOCKET:
         try:
             if state == 0x7F:
                 _SOCKET.sendall(pPowerOff)
             else:
                 _SOCKET.sendall(pPowerOn)
-        except Exception as e:
+        except TimeoutError as e:
             print(f'Error: {e}')
-            

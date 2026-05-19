@@ -1,10 +1,8 @@
 """Main GUI application for audio mixing kiosk interface."""
-import tkinter as tk
 import ttkbootstrap as ttk
-from ttkbootstrap.constants import LEFT
 from PIL import Image, ImageTk
 from uihelper import drawfaderbank, ip_settings, preamp_settings, prompt_password
-from ahm_control import initialize_connection, close_connection, restart_connection
+from ahm_control import initialize_connection, close_connection
 
 ## Most code was generated with ChatGPT 5.2 and rewritten to fit needs
 
@@ -16,8 +14,8 @@ class SimpleApp:
         self.master = master
 
         self.width = width
-        self.height = height   
-        
+        self.height = height
+
         style = ttk.Style()
         # Configure button styles
         style.configure("danger.TButton", font=("Arial", 24), padding=8)
@@ -34,8 +32,8 @@ class SimpleApp:
         style.configure("phmpOn.TButton", font=("Arial", 14), padding=0, background="#6A0DAD", bordercolor="#6A0DAD")
         style.configure("phmpOff.TButton", font=("Arial", 14), padding=0, background="#363C4D", bordercolor="#363C4D")
         style.configure("phmpTest.TButton", font=("Arial", 14), padding=0, background="#FF0077", bordercolor="#FF3974")
-    
-    
+
+
         drawfaderbank(self, master)
 
         pil_image = Image.open("resources/power.png")
@@ -124,8 +122,7 @@ class SimpleApp:
             command=self.settings_window.destroy,
         )
         escape_button.pack(side="bottom", padx=30, pady=16)
-        
-        """Menu to switch between Network and Audio Settings"""
+
         menu_frame = ttk.Frame(self.settings_window)
         menu_frame.pack(pady=10)
         network_button = ttk.Button(
@@ -147,7 +144,7 @@ class SimpleApp:
 
         )
         audio_button.pack(side="left", padx=10)
-        
+
     def show_settings_panel(self, panel_type):
         """Display the selected settings panel.
 
@@ -175,11 +172,11 @@ class SimpleApp:
 if __name__ == "__main__":
     # Kiosk features
     app = ttk.Window(themename="darkly", scaling=1.5)
-    width = 800
-    height = 480
-    print(f"Screen size: {width}x{height}")
+    main_width = 800
+    main_height = 480
+    print(f"Screen size: {main_width}x{main_height}")
     initialize_connection()  # Establish AHM connection at startup
-    SimpleApp(width, height, app)
+    SimpleApp(main_width, main_height, app)
     app.attributes("-fullscreen", True)
     app.resizable(False, False)
     app.protocol("WM_DELETE_WINDOW", lambda: None)  # Disable window closing
