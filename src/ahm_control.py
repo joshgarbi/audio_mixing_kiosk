@@ -114,29 +114,29 @@ def get_ch_level(fader):
     if _SOCKET:
         try:
             _SOCKET.sendall(get_level)
-            data = _SOCKET.recv(16)
-            return data[6] * 100 / 127
+            temp = _SOCKET.recv(16)
+            return temp[6] * 100 / 127
         except TimeoutError as e:
             print(f'Error: {e}')
             return -1
     return -1
 
 def set_ch_gain(value, fader):
-    SETLEVEL = bytes([0xB0, 0x63, fader, 0xB0, 0x62, 0x19, 0xB0, 0x06])
+    set_level = bytes([0xB0, 0x63, fader, 0xB0, 0x62, 0x19, 0xB0, 0x06])
     if _SOCKET:
         try:
             scaled_value = int(value * 127 / 100) # Ensure 100 maps to 127, not 126
             level_byte = bytes([scaled_value])
-            _SOCKET.sendall(SETLEVEL + level_byte)
+            _SOCKET.sendall(set_level + level_byte)
             # time.sleep(0.1)
         except TimeoutError as e:
             print(f'Error: {e}')
 
 def get_ch_gain(fader):
-    GETLEVEL = SYSEX_HEADER + bytes([0x00, 0x01, 0x0B, 0x19, fader, 0xF7])
+    get_level = SYSEX_HEADER + bytes([0x00, 0x01, 0x0B, 0x19, fader, 0xF7])
     if _SOCKET:
         try:
-            _SOCKET.sendall(GETLEVEL)
+            _SOCKET.sendall(get_level)
             temp = _SOCKET.recv(16)
             return temp[6] * 100 / 127
         except TimeoutError as e:
@@ -145,11 +145,11 @@ def get_ch_gain(fader):
     return -1
 
 
-def get_ch_pPower(fader):
-    GETPPOWER = SYSEX_HEADER + bytes([0x00, 0x01, 0x0B, 0x1B, fader, 0xF7])
+def get_ch_ppower(fader):
+    get_ppower = SYSEX_HEADER + bytes([0x00, 0x01, 0x0B, 0x1B, fader, 0xF7])
     if _SOCKET:
         try:
-            _SOCKET.sendall(GETPPOWER)
+            _SOCKET.sendall(get_ppower)
             temp = _SOCKET.recv(16)
             print(f"Phantom power status for fader {fader}: {temp[6]}")
             return temp[6]
@@ -158,15 +158,15 @@ def get_ch_pPower(fader):
             return -1
     return -1
 
-def toggle_ch_pPower(fader):
-    pPowerOff = bytes([0xB0, 0x63, fader, 0xB0, 0x62, 0x1B, 0xB0, 0x06, 0x00])
-    pPowerOn = bytes([0xB0, 0x63, fader, 0xB0, 0x62, 0x1B, 0xB0, 0x06, 0x7F])
-    state = get_ch_pPower(fader)
+def toggle_ch_ppower(fader):
+    ppower_off = bytes([0xB0, 0x63, fader, 0xB0, 0x62, 0x1B, 0xB0, 0x06, 0x00])
+    ppower_on = bytes([0xB0, 0x63, fader, 0xB0, 0x62, 0x1B, 0xB0, 0x06, 0x7F])
+    state = get_ch_ppower(fader)
     if _SOCKET:
         try:
             if state == 0x7F:
-                _SOCKET.sendall(pPowerOff)
+                _SOCKET.sendall(ppower_off)
             else:
-                _SOCKET.sendall(pPowerOn)
+                _SOCKET.sendall(ppower_on)
         except TimeoutError as e:
             print(f'Error: {e}')

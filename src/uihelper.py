@@ -1,13 +1,10 @@
 import ttkbootstrap as ttk
 import tkinter as tk
-from ttkbootstrap import style
 from ttkbootstrap.constants import *
 import json
-import tkinter as tk
-import ttkbootstrap as ttk
 from ttkbootstrap.constants import LEFT, RIGHT
 from fader import FaderManager
-from ahm_control import test_connection, restart_connection, toggle_ch_pPower, get_ch_pPower
+from ahm_control import test_connection, restart_connection, toggle_ch_ppower, get_ch_ppower
 from password_manager import verify_pass
 import yaml
 
@@ -35,7 +32,7 @@ def drawfaderbank(self, master_c):
 
 def ip_settings(self, master_c):
     """Display IP and port settings UI."""
-    self.masterC = master_c
+    self.master_c = master_c
     style = ttk.Style()
 
     style.configure("Red.TLabel", foreground="red")
@@ -122,7 +119,7 @@ def ip_settings(self, master_c):
 
 def preamp_settings(self, masterC):
 
-    with open('src/cfg.json', 'r') as jsonfile:
+    with open('src/cfg.json', 'r', encoding='utf-8') as jsonfile:
         data = json.load(jsonfile)
 
     faders = data["BANK"]
@@ -199,14 +196,14 @@ def validate_ip(self, ip_str, debug=False):
 def savedata(label, value, os_path=PI_IP_PATH):
     if label[0:3] == "pi_":
         try:
-            with open(os_path, "r") as yamlfile:
+            with open(os_path, "r", encoding="utf-8") as yamlfile:
                 data = yaml.safe_load(yamlfile)
                 if label == "pi_ip_address":
                     data["network"]["ethernets"]["eth0"]["addresses"][0] = f"{value}/24"
                 elif label == "pi_subnet_mask":
                     prefix_length = sum(bin(int(x)).count("1") for x in value.split("."))
                     data["network"]["ethernets"]["eth0"]["addresses"][0] = f"{getdata('pi_ip_address')}/{prefix_length}"
-            with open(os_path, "w") as yamlfile:
+            with open(os_path, "w", encoding="utf-8") as yamlfile:
                 yaml.safe_dump(data, yamlfile)
         except (FileNotFoundError, yaml.YAMLError) as e:
             print(f"Error writing to {os_path}: {e}")
@@ -222,18 +219,17 @@ def savedata(label, value, os_path=PI_IP_PATH):
 def getdata(label, os_path=PI_IP_PATH):
     if label[0:3] == "pi_":
         try:
-            with open(os_path, "r") as yamlfile:
+            with open(os_path, "r", encoding="utf-8") as yamlfile:
                 data = yaml.safe_load(yamlfile)
                 if label == "pi_ip_address":
                     return data["network"]["ethernets"]["eth0"]["addresses"][0].split("/")[0]
-                elif label == "pi_subnet_mask":
+                if label == "pi_subnet_mask":
                     prefix_length = int(data["network"]["ethernets"]["eth0"]["addresses"][0].split("/")[1])
                     subnet_mask = ".".join([str((0xffffffff << (32 - prefix_length) >> i) & 0xff) for i in [24, 16, 8, 0]])
                     return subnet_mask
-        except Exception as e:
+        except (FileNotFoundError, yaml.YAMLError) as e:
             return e
     else:
-        """Retrieve configuration value from JSON file."""
         with open("src/cfg.json", "r", encoding="utf-8") as jsonfile:
             data = json.load(jsonfile)
 
@@ -300,15 +296,15 @@ def check_password(self):
 
 
 def toggle_preamp(self, fader, ch):
-    toggle_ch_pPower(int(ch))
+    toggle_ch_ppower(int(ch))
 
 
-    if 0 <= get_ch_pPower(ch) <= 63:
-        toggle_ch_pPower(int(ch))
+    if 0 <= get_ch_ppower(ch) <= 63:
+        toggle_ch_ppower(int(ch))
         print(f"Preamp for {fader} is now ON")
         getattr(self, f"toggle_{fader}").configure(style="phmpOn.TButton")
-    elif 64 <= get_ch_pPower(ch) <= 456:
-        toggle_ch_pPower(int(ch))
+    elif 64 <= get_ch_ppower(ch) <= 456:
+        toggle_ch_ppower(int(ch))
         print(f"Preamp for {fader} is now OFF")
         getattr(self, f"toggle_{fader}").configure(style="phmpOff.TButton")
     else:

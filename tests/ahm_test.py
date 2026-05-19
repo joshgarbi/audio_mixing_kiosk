@@ -1,11 +1,11 @@
-import pytest
 import json
 import os
-from ahm_control import initialize_connection, close_connection, get_ch_level, test_connection, toggleCHpPower, getCHpPower
 import socket
+import pytest
+from ahm_control import test_connection, toggle_ch_ppower, get_ch_ppower
 
 
-_CONNECT_STATUS = False
+_connect_status = False
 
 @pytest.fixture
 def get_test_connection():
@@ -28,8 +28,8 @@ def test_l_ahm_connection(pytestconfig):
             ip = data["TCP"]["ip_address"]
             port = data["TCP"]["port"]
             s.connect((ip, port))
-            _CONNECT_STATUS = True
-    except Exception as e:
+            _connect_status = True
+    except TimeoutError as e:
         print(f"Connection failed: {e}")
         assert False, "Could not connect to AHM server"
 
@@ -40,11 +40,11 @@ def test_l_ahm_connection(pytestconfig):
 def test_phantom_power(pytestconfig):
     if pytestconfig.getoption("no_AHM"):
         pytest.skip("AHM control test skipped by command line option")
-    init_status = getCHpPower()
-    toggleCHpPower()
-    new_status = getCHpPower()
+    init_status = get_ch_ppower()
+    toggle_ch_ppower()
+    new_status = get_ch_ppower()
     assert init_status != new_status, "Phantom power state did not toggle"
-    toggleCHpPower()  # Toggle back to original state
-    final_status = getCHpPower()
+    toggle_ch_ppower()  # Toggle back to original state
+    final_status = get_ch_ppower()
     assert final_status == init_status, "Phantom power state did not return to original value"
     

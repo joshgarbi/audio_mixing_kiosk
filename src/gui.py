@@ -29,9 +29,27 @@ class SimpleApp:
             hoverbackground="#007add",
         )
         style.configure("tertiary.TFrame", background="#1e1e1e")
-        style.configure("phmpOn.TButton", font=("Arial", 14), padding=0, background="#6A0DAD", bordercolor="#6A0DAD")
-        style.configure("phmpOff.TButton", font=("Arial", 14), padding=0, background="#363C4D", bordercolor="#363C4D")
-        style.configure("phmpTest.TButton", font=("Arial", 14), padding=0, background="#FF0077", bordercolor="#FF3974")
+        style.configure(
+            "phmpOn.TButton",
+            font=("Arial", 14),
+            padding=0,
+            background="#6A0DAD",
+            bordercolor="#6A0DAD"
+        )
+        style.configure(
+            "phmpOff.TButton",
+            font=("Arial", 14),
+            padding=0,
+            background="#363C4D",
+            bordercolor="#363C4D"
+        )
+        style.configure(
+            "phmpTest.TButton",
+            font=("Arial", 14),
+            padding=0,
+            background="#FF0077",
+            bordercolor="#FF3974"
+        )
 
 
         drawfaderbank(self, master)
@@ -155,7 +173,7 @@ class SimpleApp:
             if hasattr(self, attr) and getattr(self, attr) is not None:
                 try:
                     getattr(self, attr).destroy()
-                except Exception:
+                except AttributeError:
                     pass
                 setattr(self, attr, None)
 
@@ -172,11 +190,11 @@ class SimpleApp:
 if __name__ == "__main__":
     # Kiosk features
     app = ttk.Window(themename="darkly", scaling=1.5)
-    main_width = 800
-    main_height = 480
-    print(f"Screen size: {main_width}x{main_height}")
+    MAIN_WIDTH = 800
+    MAIN_HEIGHT = 480
+    print(f"Screen size: {MAIN_WIDTH}x{MAIN_HEIGHT}")
     initialize_connection()  # Establish AHM connection at startup
-    SimpleApp(main_width, main_height, app)
+    SimpleApp(MAIN_WIDTH, MAIN_HEIGHT, app)
     app.attributes("-fullscreen", True)
     app.resizable(False, False)
     app.protocol("WM_DELETE_WINDOW", lambda: None)  # Disable window closing

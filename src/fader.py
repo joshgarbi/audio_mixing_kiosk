@@ -1,10 +1,9 @@
 """Fader widget manager for controlling audio channel levels."""
 import json
-import random
 import tkinter as tk
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import LEFT, VERTICAL
-from audiometer import GradientAudioMeter
+# from audiometer import GradientAudioMeter
 from ahm_control import set_ch_level, get_ch_level
 
 with open('src/cfg.json', 'r', encoding='utf-8') as jsonfile:
@@ -64,7 +63,7 @@ class Fader:
         slider_length = max(180, fader_height - 100)
         slider_width = max(24, min(46, fader_width // 3))
         slider_handle = max(35, min(70, slider_length // 4))
-        meter_width = max(12, min(24, fader_width // 5))
+        # meter_width = max(12, min(24, fader_width // 5))
         label_size = max(12, min(18, fader_width // 6))
 
         self.fader1group = ttk.Frame(master, style="tertiary.TFrame")
@@ -121,5 +120,3 @@ class Fader:
     #     level += noise
     #     # self.level1.set_level(level)
     #     self.master.after(self.update_interval, self.update_fader_level)
-        
-    
