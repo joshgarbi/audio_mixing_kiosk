@@ -1,0 +1,39 @@
+name: Sync Main to Dev
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync-branches:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          # Fetch all history so Git can find the common ancestor for the merge
+          fetch-depth: 0
+          # Use a custom token if you want this push to trigger other workflows (optional)
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git Identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync Dev Branch
+        run: |
+          # Fetch the latest changes across all branches
+          git fetch origin
+          
+          # Switch to dev and ensure it matches the remote tracking branch
+          git checkout dev
+          git reset --hard origin/dev
+          
+          # Merge main into dev
+          echo "Merging main into dev..."
+          git merge origin/main --no-edit
+          
+          # Push the changes back to the remote repository
+          git push origin dev

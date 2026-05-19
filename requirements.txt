@@ -4,3 +4,4 @@ pythonping==1.1.4
 keyring==25.7.0
 bcrypt==5.0.0
 keyrings.alt==5.0.2
+pyyaml==6.0.2

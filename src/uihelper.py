@@ -9,8 +9,9 @@ from ttkbootstrap.constants import LEFT, RIGHT
 from fader import FaderManager
 from ahm_control import test_connection, restart_connection, toggleCHpPower, getCHpPower
 from password_manager import verify_pass
+import yaml
 
-
+pi_ip_path = "/etc/netplan/50-cloud-init.yaml"
 
 def drawfaderbank(self, master_c):
     """Draw the fader bank widget."""
@@ -29,7 +30,7 @@ def drawfaderbank(self, master_c):
 
     self.faders = FaderManager(self.faderBank)
     self.faders.create_faders()
-    self.faders.update_all()
+    # self.faders.update_all()
 
 
 def ip_settings(self, master_c):
@@ -40,18 +41,24 @@ def ip_settings(self, master_c):
     style.configure("Red.TLabel", foreground="red")
     style.configure("Green.TLabel", foreground="green")
 
-    ip_frame = ttk.Frame(master_c)
+    # create a parent panel so we can destroy/place-forget the whole settings group
     frame_width = min(500, self.width - 40)
-    ip_frame.place(relx=0.5, rely=0.2, anchor="n", width=frame_width, height=84)
+    network_panel = ttk.Frame(master_c)
+    network_panel.place(relx=0.5, rely=0.2, anchor="n", width=frame_width, height=172)
+
+    ip_frame = ttk.Frame(network_panel)
+    ip_frame.place(x=0, y=0, width=frame_width, height=84)
 
     vip_cmd = (ip_frame.register(lambda p: validate_ip(self, p)), "%P")
-    vport_cmd = (ip_frame.register(lambda p: validate_port(self, p)), "%P")
+    # vport_cmd = (ip_frame.register(lambda p: validate_port(self, p)), "%P")
 
     ip_settings_var = ttk.Entry(
         ip_frame,
         validate="focusout",
         validatecommand=vip_cmd,
     )
+    
+    
 
     ip_settings_var.delete(0, tk.END)
     ip_settings_var.insert(0, getdata("ip_address"))
@@ -59,17 +66,17 @@ def ip_settings(self, master_c):
     ip_settings_var.configure(font=("Arial", 18))
     ip_settings_var.place(x=5, y=5, width=220, height=40)
 
-    port_settings_var = ttk.Entry(
-        ip_frame,
-        validate="focusout",
-        validatecommand=vport_cmd,
-    )
+    # port_settings_var = ttk.Entry(
+    #     ip_frame,
+    #     validate="focusout",
+    #     validatecommand=vport_cmd,
+    # )
 
-    port_settings_var.delete(0, tk.END)
-    port_settings_var.insert(0, getdata("port"))
+    # port_settings_var.delete(0, tk.END)
+    # port_settings_var.insert(0, getdata("port"))
 
-    port_settings_var.configure(font=("Arial", 18))
-    port_settings_var.place(x=230, y=5, width=100, height=40)
+    # port_settings_var.configure(font=("Arial", 18))
+    # port_settings_var.place(x=230, y=5, width=100, height=40)
 
     self.connectionStatus = ttk.Label(
         ip_frame,
@@ -83,6 +90,37 @@ def ip_settings(self, master_c):
     else:
         self.connectionStatus.configure(style="Red.TLabel")
         
+    """Display IP and Subnet Mask settings for the Raspberry Pi"""
+    pi_ip_frame = ttk.Frame(network_panel)
+    pi_ip_frame.place(x=0, y=84, width=frame_width, height=84)
+    
+    pi_ip_settings_var = ttk.Entry(
+        pi_ip_frame,
+        validate="focusout",
+        # validatecommand=vip_cmd, do not implement without AHM controller authentication
+    )
+    pi_ip_settings_var.delete(0, tk.END)
+    pi_ip_settings_var.insert(0, getdata("pi_ip_address"))
+    pi_ip_settings_var.configure(font=("Arial", 18))
+    pi_ip_settings_var.place(x=5, y=5, width=220, height=40)
+    
+    pi_subnet_settings_var = ttk.Entry(
+        pi_ip_frame,
+        validate="focusout",
+        # validatecommand=vip_cmd, do not implement without AHM controller authentication
+    )
+    pi_subnet_settings_var.delete(0, tk.END)
+    pi_subnet_settings_var.insert(0, getdata("pi_subnet_mask"))
+    pi_subnet_settings_var.configure(font=("Arial", 18))
+    pi_subnet_settings_var.place(x=230, y=5, width=220, height=40)
+    # attach the panel to `self` so callers can destroy it later
+    self.network_panel = network_panel
+    return network_panel
+    
+    
+    
+    
+    
 def preamp_settings(self, masterC):
     
     with open('src/cfg.json', 'r') as jsonfile:
@@ -110,9 +148,9 @@ def preamp_settings(self, masterC):
         getattr(self, f"toggle_{fader}").configure(style="phmpOff.TButton")
         x_pos = start_x + index * (button_size + button_gap)
         getattr(self, f"toggle_{fader}").place(x=x_pos, y=10, width=button_size, height=button_size)
-        
-    
-        
+    # attach the panel to `self` so callers can destroy it later
+    self.preamp_panel = preamp_frame
+    return preamp_frame
     
         
 def handle_reconnection(self):
@@ -159,22 +197,49 @@ def validate_ip(self, ip_str, debug=False):
 
 
 
-def savedata(label, value):
-    """Save configuration value to JSON file."""
-    with open("src/cfg.json", "r", encoding="utf-8") as jsonfile:
-        data = json.load(jsonfile)
+def savedata(label, value, os_path=pi_ip_path):
+    if label[0:3] == "pi_":
+        try:
+            with open(os_path, "r") as yamlfile:
+                data = yaml.safe_load(yamlfile)
+                if label == "pi_ip_address":
+                    data["network"]["ethernets"]["eth0"]["addresses"][0] = f"{value}/24"
+                elif label == "pi_subnet_mask":
+                    prefix_length = sum(bin(int(x)).count("1") for x in value.split("."))
+                    data["network"]["ethernets"]["eth0"]["addresses"][0] = f"{getdata('pi_ip_address')}/{prefix_length}"
+            with open(os_path, "w") as yamlfile:
+                yaml.safe_dump(data, yamlfile)
+        except (FileNotFoundError, yaml.YAMLError) as e:
+            print(f"Error writing to {os_path}: {e}")
+    else:
+        """Save configuration value to JSON file."""
+        with open("src/cfg.json", "r", encoding="utf-8") as jsonfile:
+            data = json.load(jsonfile)
 
-    data["TCP"][label] = value
+        data["TCP"][label] = value
 
-    with open("src/cfg.json", "w", encoding="utf-8") as jsonfile:
-        json.dump(data, jsonfile, indent=4)      
+        with open("src/cfg.json", "w", encoding="utf-8") as jsonfile:
+            json.dump(data, jsonfile, indent=4)      
 
-def getdata(label):
-    """Retrieve configuration value from JSON file."""
-    with open("src/cfg.json", "r", encoding="utf-8") as jsonfile:
-        data = json.load(jsonfile)
+def getdata(label, os_path=pi_ip_path):
+    if label[0:3] == "pi_":
+        try:
+            with open(os_path, "r") as yamlfile:
+                data = yaml.safe_load(yamlfile)
+                if label == "pi_ip_address":
+                    return data["network"]["ethernets"]["eth0"]["addresses"][0].split("/")[0]
+                elif label == "pi_subnet_mask":
+                    prefix_length = int(data["network"]["ethernets"]["eth0"]["addresses"][0].split("/")[1])
+                    subnet_mask = ".".join([str((0xffffffff << (32 - prefix_length) >> i) & 0xff) for i in [24, 16, 8, 0]])
+                    return subnet_mask
+        except Exception as e:
+            return e
+    else:
+        """Retrieve configuration value from JSON file."""
+        with open("src/cfg.json", "r", encoding="utf-8") as jsonfile:
+            data = json.load(jsonfile)
 
-    return data["TCP"][label]
+        return data["TCP"][label]
 
 def prompt_password(self, master_c):
     """Display password prompt overlay."""
@@ -241,11 +306,13 @@ def toggle_preamp(self, fader, ch):
     
     
     if 0 <= getCHpPower(ch) <= 63:
-        print(f"Preamp for {fader} is now OFF")
-        getattr(self, f"toggle_{fader}").configure(style="phmpOff.TButton")
-    elif 64 <= getCHpPower(ch) <= 456:
+        toggleCHpPower(int(ch))
         print(f"Preamp for {fader} is now ON")
         getattr(self, f"toggle_{fader}").configure(style="phmpOn.TButton")     
+    elif 64 <= getCHpPower(ch) <= 456:
+        toggleCHpPower(int(ch))
+        print(f"Preamp for {fader} is now OFF")
+        getattr(self, f"toggle_{fader}").configure(style="phmpOff.TButton")
     else:
         print(f"Preamp for {fader} is in an unknown state")
         getattr(self, f"toggle_{fader}").configure(style="phmpTest.TButton")
