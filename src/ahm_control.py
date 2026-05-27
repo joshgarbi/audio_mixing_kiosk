@@ -24,6 +24,25 @@ AHM_PORT = data["TCP"]["port"]
 # Persistent socket connection
 _SOCKET = None
 
+
+def _drain_socket_buffer(max_reads=10):
+    """Discard any pending inbound data so next query reads a fresh response."""
+    if not _SOCKET:
+        return
+
+    original_timeout = _SOCKET.gettimeout()
+    try:
+        _SOCKET.settimeout(0.01)
+        for _ in range(max_reads):
+            chunk = _SOCKET.recv(1024)
+            if not chunk:
+                break
+    except (socket.timeout, TimeoutError, OSError):
+        # Timeout means there is no more pending data to drain.
+        pass
+    finally:
+        _SOCKET.settimeout(original_timeout)
+
 def initialize_connection():
     """Initialize TCP connection to AHM device."""
     global _SOCKET
@@ -136,6 +155,8 @@ def get_ch_gain(fader):
     get_level = SYSEX_HEADER + bytes([0x00, 0x01, 0x0B, 0x19, fader, 0xF7])
     if _SOCKET:
         try:
+            # Clear feedback/echo from prior writes so this read matches this query.
+            _drain_socket_buffer()
             _SOCKET.sendall(get_level)
             temp = _SOCKET.recv(16)
             return temp[6] * 100 / 127
@@ -151,7 +172,6 @@ def get_ch_ppower(fader):
         try:
             _SOCKET.sendall(get_ppower)
             temp = _SOCKET.recv(16)
-            print(f"Phantom power status for fader {fader}: {temp[6]}")
             return temp[6]
         except TimeoutError as e:
             print(f'Error: {e}')
