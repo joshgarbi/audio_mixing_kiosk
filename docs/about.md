@@ -1,9 +1,22 @@
-# TK Interface and Bootstrap
+# Audio Mixing Kiosk
+## UI
+    The UI is meant to be simple and plain. The purpose is to give the user only the most vital controls for mixing while removing everything that may make the system feel complicated or busy.
+
+### Fader Bank (main page)
+    When starting up the Kiosk, the user is shown the screen they need to start mixing. From there they can access power and settings (with admin password). 
+
+### Settings
+    Settings page controlls the configuration of the kiosk for the network as well as the preamp settings for the mixer.
+
+## Main Libraries
 ### [Tkinter](https://docs.python.org/3/library/tkinter.html)
     The tk interface is a light python interface to the Tk GUI toolkit. 
 
 ### [ttkbootstrap](https://ttkbootstrap.readthedocs.io/en/latest/)
     ttkbootstrap builds upon tkinter with addtional styling, formating, and additional functionality. It makes tkinter feel similar to web development with the comination of constraints and styling. 
+
+### [Keyring](https://keyring.readthedocs.io/en/latest/)
+    Keyring manages the admin password for the settings menu. For first time use, password_manager.py must be run in order to initialize a password on the system.
 
 ## This Project
 
@@ -18,9 +31,9 @@
 
     Creates a fader UI object according to listed constraints. Each fader object has a meter and level values associated with it.
 
-### [audiometer.py](../src/audiometer.py)
+### [audiometer.py](../src/audiometer.py) -deprecated
 
-    Determining the meter colors is a bit complicated. This file handles the color value for the meter based on height from base and changes color. It uses an alpha layer to modulate the meter
+    Determining the meter colors is a bit complicated. This file handles the color value for the meter based on height from base and changes color. It uses an alpha layer to modulate the meter. Currently removed from UI.
 
 ### [ahm_control.py](../src/ahm_control.py) 
 
