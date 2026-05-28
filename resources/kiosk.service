@@ -1,17 +1,16 @@
 [Unit]
-Description=Audio Mixing Kiosk Application
-After=graphical.target display-manager.service
-Wants=display-manager.service
+Description=Wayland Audio Kiosk
+After=login.target systemd-user-sessions.service
 
 [Service]
-Type=simple
-User=pi
-Environment=DISPLAY=:0
-Environment=XAUTHORITY=/home/pi/.Xauthority
-WorkingDirectory=/home/pi/your_app
-ExecStart=/usr/bin/python3 /home/pi/your_app/main.py
-Restart=on-failure
-RestartSec=5
+User=avk
+WorkingDirectory=/home/yourusername/your_app_directory
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+Environment=WLR_RENDERER=pixman
+# This line handles your execution natively with full group access
+ExecStart=/usr/bin/cage -s -- .venv/bin/python3 home/avk/kiosk/audio_mixing_kiosk/src/gui.py
+Restart=always
+RestartSec=3
 
 [Install]
 WantedBy=graphical.target
