@@ -1,16 +1,17 @@
 [Unit]
-    Description=Audio Mixing Kiosk Application
-    After=graphical.target
+Description=Audio Mixing Kiosk Application
+After=graphical.target display-manager.service
+Wants=display-manager.service
 
-    [Service]
-    Type=simple
-    User=pi
-    Environment=DISPLAY=:0
-    Environment=XAUTHORITY=/home/pi/.Xauthority
-    WorkingDirectory=/home/pi/your_app
-    ExecStart=/usr/bin/python3 /home/pi/your_app/main.py
-    Restart=on-failure
-    RestartSec=5
+[Service]
+Type=simple
+User=pi
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/pi/.Xauthority
+WorkingDirectory=/home/pi/your_app
+ExecStart=/usr/bin/python3 /home/pi/your_app/main.py
+Restart=on-failure
+RestartSec=5
 
-    [Install]
-    WantedBy=graphical.target
+[Install]
+WantedBy=graphical.target
