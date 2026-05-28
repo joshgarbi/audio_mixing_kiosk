@@ -1,13 +1,24 @@
 [Unit]
 Description=Wayland Audio Kiosk
 After=login.target systemd-user-sessions.service
+Wants=systemd-user-sessions.service
 
 [Service]
 User=avk
-WorkingDirectory=/home/yourusername/your_app_directory
+WorkingDirectory=/home/avk/kiosk/audio_mixing_kiosk
+
+# 1. Gives the service permission to access the local seat/hardware keys
+PAMName=login
+
+# 2. Tell Wayland which physical seat to use (seat0 is the default local monitor/keyboard)
+Environment=XDG_SEAT=seat0
 Environment=XDG_RUNTIME_DIR=/run/user/1000
+
+# 3. Explicitly tell Cage to run headlessly without expecting a parent X server
+Environment=WLR_BACKENDS=drm,libinput
 Environment=WLR_RENDERER=pixman
-# This line handles your execution natively with full group access
+
+# 4. Your absolute path execution string
 ExecStart=/usr/bin/cage -s -- .venv/bin/python3 home/avk/kiosk/audio_mixing_kiosk/src/gui.py
 Restart=always
 RestartSec=3
