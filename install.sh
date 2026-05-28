@@ -49,3 +49,19 @@ sudo ln -s /dev/null /usr/share/icons/Adwaita/cursors/left_ptr
 # echo "Rule created at $RULE_FILE"
 
 sudo chmod 666 /etc/netplan/50-cloud-init.yaml
+
+echo "Setting up autostart with systemd..."
+
+LOCAL_SERVICE_FILE="resources/kiosk.service"
+SYSTEM_SERVICE_FILE="/etc/systemd/system/kiosk.service"
+# Copy the service file to systemd directory
+sudo cp $LOCAL_SERVICE_FILE $SYSTEM_SERVICE_FILE
+# set permissions
+sudo chmod 644 $SYSTEM_SERVICE_FILE
+# Reload systemd to recognize the new service
+sudo systemctl daemon-reload
+# Enable the service to start on boot
+sudo systemctl enable kiosk.service
+
+echo "--- Kiosk Setup Complete ---"
+

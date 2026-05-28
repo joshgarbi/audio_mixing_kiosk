@@ -3,6 +3,8 @@ import ttkbootstrap as ttk
 from PIL import Image, ImageTk
 from uihelper import drawfaderbank, ip_settings, preamp_settings, prompt_password
 from ahm_control import initialize_connection, close_connection
+import sys
+import os
 
 ## Most code was generated with ChatGPT 5.2 and rewritten to fit needs
 
@@ -106,7 +108,7 @@ class SimpleApp:
 
         yes_button = ttk.Button(
             dialog_frame, width=10, text="Shut Down", bootstyle="danger",
-            command=self.shutdown
+            command=lambda: self.shutdown(soft=False)
         )
         yes_button.pack(side="left", padx=20, pady=16)
         no_button = ttk.Button(
@@ -131,6 +133,16 @@ class SimpleApp:
             foreground="white",
         )
         label.pack(pady=20)
+        
+        self.settings_button = ttk.Button(
+            self.settings_window,
+            text="Soft Exit",
+            bootstyle="tertiary",
+            style="Dialog.TButton",
+            command=lambda: self.shutdown(soft=True),
+        )
+        self.settings_button.pack(side="bottom", padx=30, pady=20)
+        
         escape_button = ttk.Button(
             self.settings_window,
             width=16,
@@ -162,6 +174,8 @@ class SimpleApp:
 
         )
         audio_button.pack(side="left", padx=10)
+        
+        
 
     def show_settings_panel(self, panel_type):
         """Display the selected settings panel.
@@ -177,15 +191,25 @@ class SimpleApp:
                     pass
                 setattr(self, attr, None)
 
-        if panel_type == "network":
-            ip_settings(self, self.settings_window)
-        elif panel_type == "audio":
-            preamp_settings(self, self.settings_window)
+        match panel_type:
+            case "network":
+                ip_settings(self, self.settings_window)
+            case "audio":
+                preamp_settings(self, self.settings_window)
 
-    def shutdown(self):
+    def shutdown(self, soft=False):
         """Close AHM connection and shut down application."""
-        close_connection()
-        self.master.destroy()
+        if soft:
+            close_connection()
+            self.master.destroy()
+            print("Soft exit - application closed but system remains on.")
+            sys.exit(0)
+        else:
+            close_connection()
+            self.master.destroy()
+            print("Shutting down system...")
+            os.system("sudo shutdown now")
+        
 
 if __name__ == "__main__":
     # Kiosk features
