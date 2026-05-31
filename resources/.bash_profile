@@ -5,6 +5,7 @@ if [[ $(tty) == /dev/tty1 ]]; then
         sleep 0.5
     done
     
+    sleep 0.5
     # 1. MOVE INTO YOUR PROJECT DIRECTORY FIRST
     # This aligns Python's relative path lookups with your files
     cd /home/avk/kiosk/audio_mixing_kiosk
