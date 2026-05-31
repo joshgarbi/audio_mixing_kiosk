@@ -1,20 +1,20 @@
-# Only trigger the GUI if logging into the main physical monitor console (tty1)
 if [[ $(tty) == /dev/tty1 ]]; then
     
-    # Define the runtime directory path (1000 is the default primary user ID)
     export XDG_RUNTIME_DIR=/run/user/$(id -u)
-
-    # LOOP: If the directory doesn't exist yet, wait 1 second and check again
     while [ ! -d "$XDG_RUNTIME_DIR" ]; do
-        sleep 1
+        sleep 0.5
     done
     
-    # Inject your specific software rendering pipeline variable
+    # 1. MOVE INTO YOUR PROJECT DIRECTORY FIRST
+    # This aligns Python's relative path lookups with your files
+    cd /home/yourusername/your_app_directory
+    
+    # 2. Set up your rendering flags
     export WLR_RENDERER=pixman
+    export WLR_BACKENDS=drm,libinput
+    export XDG_SEAT=seat0
     
-    # Launch Cage with your absolute application paths
-    cage -s -- /home/avk/kiosk/audio_mixing_kiosk/.venv/bin/python3 /home/avk/kiosk/audio_mixing_kiosk/src/gui.py
-    
-    # Developer Exit Protocol
-    logout
+    # 3. Launch Cage using paths relative to this directory
+    # Notice we can use local paths now because 'cd' placed us in the right folder
+    exec cage -s -- .venv/bin/python3 src/gui.py
 fi
