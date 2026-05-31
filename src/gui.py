@@ -1,4 +1,6 @@
 """Main GUI application for audio mixing kiosk interface."""
+import subprocess
+
 import ttkbootstrap as ttk
 from PIL import Image, ImageTk
 from uihelper import drawfaderbank, ip_settings, preamp_settings, prompt_password
@@ -205,10 +207,11 @@ class SimpleApp:
             print("Soft exit - application closed but system remains on.")
             sys.exit(0)
         else:
-            close_connection()
-            self.master.destroy()
-            print("Shutting down system...")
-            os.system("sudo shutdown now")
+            try:
+                subprocess.run(["sudo", "shutdown", "-h", "now"], check=True)
+            except Exception as e:
+                print(f"Shutdown hook failed: {e}")
+                sys.exit(0)
         
 
 if __name__ == "__main__":
