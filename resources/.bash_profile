@@ -7,7 +7,7 @@ if [[ $(tty) == /dev/tty1 ]]; then
     
     # 1. MOVE INTO YOUR PROJECT DIRECTORY FIRST
     # This aligns Python's relative path lookups with your files
-    cd /home/yourusername/your_app_directory
+    cd /home/avk/kiosk/audio_mixing_kiosk
     
     # 2. Set up your rendering flags
     export WLR_RENDERER=pixman
