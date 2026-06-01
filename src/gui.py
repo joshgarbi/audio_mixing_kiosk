@@ -211,6 +211,7 @@ class SimpleApp:
                 subprocess.run(["sudo", "shutdown", "-h", "now"], check=True)
             except Exception as e:
                 print(f"Shutdown hook failed: {e}")
+                self.master.destroy()
                 sys.exit(0)
         
 
