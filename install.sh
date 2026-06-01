@@ -63,5 +63,23 @@ sudo systemctl daemon-reload
 # Enable the service to start on boot
 sudo systemctl enable kiosk.service
 
+echo "Running final setup steps..."
+
+sudo systemctl mask systemd-networkd-wait-online.service
+
+sudo touch /etc/cloud/cloud-init.disabled
+
+sudo systemctl disable snapd.service snapd.seeded.service
+
+sudo systemctl stop snapd.socket snapd.autoimport.service
+sudo systemctl disable snapd.socket snapd.autoimport.service
+
+sudo systemctl daemon-reload
+
 echo "--- Kiosk Setup Complete ---"
+echo "rebooting system in 5 seconds..."
+sleep 5
+sudo reboot
+
+
 
