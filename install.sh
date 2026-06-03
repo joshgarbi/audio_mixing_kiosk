@@ -80,6 +80,3 @@ echo "--- Kiosk Setup Complete ---"
 echo "rebooting system in 5 seconds..."
 sleep 5
 sudo reboot
-
-
-
