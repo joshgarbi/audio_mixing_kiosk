@@ -38,13 +38,13 @@ def ip_settings(self, master_c):
     style.configure("Red.TLabel", foreground="red")
     style.configure("Green.TLabel", foreground="green")
 
-    # create a parent panel so we can destroy/place-forget the whole settings group
+    # Place panel just below the 52px top bar; fits within the 480px screen
     frame_width = min(500, self.width - 40)
     network_panel = ttk.Frame(master_c)
-    network_panel.place(relx=0.5, rely=0.2, anchor="n", width=frame_width, height=132)
+    network_panel.place(relx=0.5, y=60, anchor="n", width=frame_width, height=110)
 
     ip_frame = ttk.Frame(network_panel)
-    ip_frame.place(x=0, y=0, width=frame_width, height=66)
+    ip_frame.place(x=0, y=0, width=frame_width, height=52)
 
     vip_cmd = (ip_frame.register(lambda p: validate_ip(self, p)), "%P")
     # vport_cmd = (ip_frame.register(lambda p: validate_port(self, p)), "%P")
@@ -61,26 +61,14 @@ def ip_settings(self, master_c):
     ip_settings_var.insert(0, getdata("ip_address"))
 
     ip_settings_var.configure(font=("Arial", 18))
-    ip_settings_var.place(x=5, y=4, width=220, height=32)
-
-    # port_settings_var = ttk.Entry(
-    #     ip_frame,
-    #     validate="focusout",
-    #     validatecommand=vport_cmd,
-    # )
-
-    # port_settings_var.delete(0, tk.END)
-    # port_settings_var.insert(0, getdata("port"))
-
-    # port_settings_var.configure(font=("Arial", 18))
-    # port_settings_var.place(x=230, y=5, width=100, height=40)
+    ip_settings_var.place(x=5, y=4, width=220, height=44)
 
     self.connectionStatus = ttk.Label(
         ip_frame,
         text="STATUS",
     )
-    self.connectionStatus.configure(font=("Arial", 16))
-    self.connectionStatus.place(x=335, y=4, width=100, height=32)
+    self.connectionStatus.configure(font=("Arial", 14))
+    self.connectionStatus.place(x=232, y=4, width=100, height=44)
 
     if test_connection() is not None:
         self.connectionStatus.configure(style="Green.TLabel")
@@ -88,7 +76,7 @@ def ip_settings(self, master_c):
         self.connectionStatus.configure(style="Red.TLabel")
 
     pi_ip_frame = ttk.Frame(network_panel)
-    pi_ip_frame.place(x=0, y=66, width=frame_width, height=66)
+    pi_ip_frame.place(x=0, y=58, width=frame_width, height=52)
 
     pi_ip_settings_var = ttk.Entry(
         pi_ip_frame,
@@ -98,7 +86,7 @@ def ip_settings(self, master_c):
     pi_ip_settings_var.delete(0, tk.END)
     pi_ip_settings_var.insert(0, getdata("pi_ip_address"))
     pi_ip_settings_var.configure(font=("Arial", 18))
-    pi_ip_settings_var.place(x=5, y=4, width=220, height=32)
+    pi_ip_settings_var.place(x=5, y=4, width=220, height=44)
 
     pi_subnet_settings_var = ttk.Entry(
         pi_ip_frame,
@@ -108,7 +96,7 @@ def ip_settings(self, master_c):
     pi_subnet_settings_var.delete(0, tk.END)
     pi_subnet_settings_var.insert(0, getdata("pi_subnet_mask"))
     pi_subnet_settings_var.configure(font=("Arial", 18))
-    pi_subnet_settings_var.place(x=230, y=4, width=220, height=32)
+    pi_subnet_settings_var.place(x=232, y=4, width=220, height=44)
     # attach the panel to `self` so callers can destroy it later
     self.network_panel = network_panel
     return network_panel
@@ -126,7 +114,7 @@ def preamp_settings(self, masterC):
 
     preamp_frame = ttk.Frame(masterC)
     frame_width = self.width - 40
-    preamp_frame.place(relx=0.5, rely=0.4, anchor="n", width=frame_width, height=74)
+    preamp_frame.place(relx=0.5, y=60, anchor="n", width=frame_width, height=74)
 
     button_size = 52
     button_gap = 10
@@ -147,7 +135,6 @@ def preamp_settings(self, masterC):
     # attach the panel to `self` so callers can destroy it later
     self.preamp_panel = preamp_frame
     return preamp_frame
-
 
 def handle_reconnection(self):
     """Reconnect to AHM device and update connection status."""

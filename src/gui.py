@@ -127,55 +127,59 @@ class SimpleApp:
         self.settings_window = ttk.Frame(self.master, style="Dark.TFrame")
         self.settings_window.place(relx=0, rely=0, relwidth=1, relheight=1)
 
+        # --- Top bar: title + tab buttons in one compact row ---
+        top_bar = ttk.Frame(self.settings_window, style="Dark.TFrame")
+        top_bar.place(x=0, y=0, relwidth=1, height=52)
+
         label = ttk.Label(
-            self.settings_window,
+            top_bar,
             text="Settings",
-            font=("Arial", 24),
+            font=("Arial", 18),
             background="#363C4D",
             foreground="white",
         )
-        label.pack(pady=20)
-        
-        self.settings_button = ttk.Button(
-            self.settings_window,
-            text="Soft Exit",
+        label.pack(side="left", padx=16)
+
+        network_button = ttk.Button(
+            top_bar,
+            text="Network",
             bootstyle="tertiary",
             style="Dialog.TButton",
-            command=lambda: self.shutdown(soft=True),
+            command=lambda: self.show_settings_panel("network"),
         )
-        self.settings_button.pack(side="bottom", padx=30, pady=10)
-        
+        network_button.pack(side="left", padx=6)
+
+        audio_button = ttk.Button(
+            top_bar,
+            text="Audio",
+            bootstyle="tertiary",
+            style="Dialog.TButton",
+            command=lambda: self.show_settings_panel("audio"),
+        )
+        audio_button.pack(side="left", padx=6)
+
+        # --- Bottom bar: action buttons ---
+        bottom_bar = ttk.Frame(self.settings_window, style="Dark.TFrame")
+        bottom_bar.place(x=0, rely=1.0, anchor="sw", relwidth=1, height=52)
+
         escape_button = ttk.Button(
-            self.settings_window,
+            bottom_bar,
             width=16,
             text="Close Settings",
             bootstyle="secondary",
             style="Dialog.TButton",
             command=self.settings_window.destroy,
         )
-        escape_button.pack(side="bottom", padx=30, pady=10)
+        escape_button.pack(side="left", padx=16, pady=6)
 
-        menu_frame = ttk.Frame(self.settings_window)
-        menu_frame.pack(pady=10)
-        network_button = ttk.Button(
-            menu_frame,
-            width=16,
-            text="Network Settings",
+        self.settings_button = ttk.Button(
+            bottom_bar,
+            text="Soft Exit",
             bootstyle="tertiary",
             style="Dialog.TButton",
-            command=lambda: self.show_settings_panel("network"),
+            command=lambda: self.shutdown(soft=True),
         )
-        network_button.pack(side="left", padx=10)
-        audio_button = ttk.Button(
-            menu_frame,
-            width=16,
-            text="Audio Settings",
-            bootstyle="tertiary",
-            style="Dialog.TButton",
-            command=lambda: self.show_settings_panel("audio"),
-
-        )
-        audio_button.pack(side="left", padx=10)
+        self.settings_button.pack(side="right", padx=16, pady=6)
         
         
 
