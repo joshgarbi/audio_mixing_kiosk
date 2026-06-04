@@ -41,10 +41,10 @@ def ip_settings(self, master_c):
     # create a parent panel so we can destroy/place-forget the whole settings group
     frame_width = min(500, self.width - 40)
     network_panel = ttk.Frame(master_c)
-    network_panel.place(relx=0.5, rely=0.2, anchor="n", width=frame_width, height=120)
+    network_panel.place(relx=0.5, rely=0.2, anchor="n", width=frame_width, height=132)
 
     ip_frame = ttk.Frame(network_panel)
-    ip_frame.place(x=0, y=0, width=frame_width, height=72)
+    ip_frame.place(x=0, y=0, width=frame_width, height=66)
 
     vip_cmd = (ip_frame.register(lambda p: validate_ip(self, p)), "%P")
     # vport_cmd = (ip_frame.register(lambda p: validate_port(self, p)), "%P")
@@ -61,7 +61,7 @@ def ip_settings(self, master_c):
     ip_settings_var.insert(0, getdata("ip_address"))
 
     ip_settings_var.configure(font=("Arial", 18))
-    ip_settings_var.place(x=5, y=4, width=220, height=36)
+    ip_settings_var.place(x=5, y=4, width=220, height=32)
 
     # port_settings_var = ttk.Entry(
     #     ip_frame,
@@ -80,7 +80,7 @@ def ip_settings(self, master_c):
         text="STATUS",
     )
     self.connectionStatus.configure(font=("Arial", 16))
-    self.connectionStatus.place(x=335, y=4, width=100, height=36)
+    self.connectionStatus.place(x=335, y=4, width=100, height=32)
 
     if test_connection() is not None:
         self.connectionStatus.configure(style="Green.TLabel")
@@ -88,7 +88,7 @@ def ip_settings(self, master_c):
         self.connectionStatus.configure(style="Red.TLabel")
 
     pi_ip_frame = ttk.Frame(network_panel)
-    pi_ip_frame.place(x=0, y=72, width=frame_width, height=72)
+    pi_ip_frame.place(x=0, y=66, width=frame_width, height=66)
 
     pi_ip_settings_var = ttk.Entry(
         pi_ip_frame,
@@ -98,7 +98,7 @@ def ip_settings(self, master_c):
     pi_ip_settings_var.delete(0, tk.END)
     pi_ip_settings_var.insert(0, getdata("pi_ip_address"))
     pi_ip_settings_var.configure(font=("Arial", 18))
-    pi_ip_settings_var.place(x=5, y=4, width=220, height=36)
+    pi_ip_settings_var.place(x=5, y=4, width=220, height=32)
 
     pi_subnet_settings_var = ttk.Entry(
         pi_ip_frame,
@@ -108,7 +108,7 @@ def ip_settings(self, master_c):
     pi_subnet_settings_var.delete(0, tk.END)
     pi_subnet_settings_var.insert(0, getdata("pi_subnet_mask"))
     pi_subnet_settings_var.configure(font=("Arial", 18))
-    pi_subnet_settings_var.place(x=230, y=4, width=220, height=36)
+    pi_subnet_settings_var.place(x=230, y=4, width=220, height=32)
     # attach the panel to `self` so callers can destroy it later
     self.network_panel = network_panel
     return network_panel
