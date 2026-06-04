@@ -143,7 +143,7 @@ class SimpleApp:
             style="Dialog.TButton",
             command=lambda: self.shutdown(soft=True),
         )
-        self.settings_button.pack(side="bottom", padx=30, pady=20)
+        self.settings_button.pack(side="bottom", padx=30, pady=10)
         
         escape_button = ttk.Button(
             self.settings_window,
@@ -153,7 +153,7 @@ class SimpleApp:
             style="Dialog.TButton",
             command=self.settings_window.destroy,
         )
-        escape_button.pack(side="bottom", padx=30, pady=16)
+        escape_button.pack(side="bottom", padx=30, pady=10)
 
         menu_frame = ttk.Frame(self.settings_window)
         menu_frame.pack(pady=10)
